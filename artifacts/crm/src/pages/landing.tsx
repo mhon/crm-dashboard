@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import {
   Users, Package, TrendingUp, Bell, LayoutDashboard, Smartphone,
-  CheckCircle2, XCircle, ArrowRight, Menu, X, Star, ChevronRight,
+  CheckCircle2, XCircle, ArrowRight, Menu, X, Star, ChevronRight, Play,
 } from "lucide-react";
 
 function useCountUp(target: number, duration = 2000, start = false) {
@@ -130,12 +130,24 @@ export default function LandingPage() {
   const { session, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
     const handler = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setShowVideo(false); };
+    if (showVideo) {
+      document.addEventListener("keydown", onKey);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [showVideo]);
 
   if (!loading && session) return <Redirect to="/dashboard" />;
 
@@ -148,6 +160,11 @@ export default function LandingPage() {
         @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-25px,15px) scale(1.03)} 66%{transform:translate(20px,-25px) scale(0.98)} }
         @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(15px,20px) scale(1.04)} }
         @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+        @keyframes modalFadeIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
+        @keyframes backdropIn { from{opacity:0} to{opacity:1} }
+        .modal-backdrop { animation: backdropIn 0.25s ease forwards; }
+        .modal-box { animation: modalFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .modal-close:hover { background: rgba(255,255,255,0.15) !important; }
         @keyframes pulse-ring { 0%{transform:scale(1);opacity:1} 100%{transform:scale(1.4);opacity:0} }
         .blob1 { animation: float1 12s ease-in-out infinite; }
         .blob2 { animation: float2 15s ease-in-out infinite; }
@@ -314,11 +331,14 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </button>
             </Link>
-            <a href="#features">
-              <button className="outline-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent" }}>
-                Watch Demo
-              </button>
-            </a>
+            <button
+              className="outline-btn"
+              onClick={() => setShowVideo(true)}
+              style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent", display: "flex", alignItems: "center", gap: "8px" }}
+            >
+              <Play size={16} fill="white" />
+              Watch Demo
+            </button>
           </div>
         </FadeIn>
 
@@ -617,6 +637,86 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Video Modal */}
+      {showVideo && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowVideo(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999,
+            background: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(8px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            className="modal-box"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "900px",
+              background: "rgba(15,18,40,0.9)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "20px",
+              overflow: "hidden",
+              boxShadow: "0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.2)",
+            }}
+          >
+            {/* Modal header */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "16px 20px",
+              borderBottom: "1px solid rgba(255,255,255,0.07)",
+              background: "rgba(255,255,255,0.03)",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{
+                  width: "28px", height: "28px", borderRadius: "6px",
+                  background: "linear-gradient(135deg,#7c3aed,#4f46e5)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Play size={12} color="white" fill="white" />
+                </div>
+                <span style={{ fontSize: "14px", fontWeight: 600, color: "#e2e8f0" }}>CRM Dashboard — Product Demo</span>
+              </div>
+              <button
+                className="modal-close"
+                onClick={() => setShowVideo(false)}
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "8px",
+                  width: "32px", height: "32px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", color: "#94a3b8",
+                  transition: "background 0.2s ease",
+                }}
+                aria-label="Close video"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* YouTube embed — unmounts on close to auto-pause */}
+            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
+              <iframe
+                src="https://www.youtube.com/embed/7nXRy-Zms2s?autoplay=1&rel=0&modestbranding=1"
+                title="CRM Dashboard Demo"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: "absolute", top: 0, left: 0,
+                  width: "100%", height: "100%",
+                  border: "none",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
