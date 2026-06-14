@@ -11,13 +11,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Customers", href: "/customers", icon: Users },
     { name: "Orders", href: "/orders", icon: ShoppingCart },
   ];
 
   const getPageTitle = () => {
-    if (location === "/") return "Dashboard";
+    if (location === "/dashboard") return "Dashboard";
     if (location === "/customers" || location.startsWith("/customers/")) return "Customers";
     if (location === "/orders") return "Orders";
     return "";
@@ -26,7 +26,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const NavLinks = () => (
     <>
       {navigation.map((item) => {
-        const isActive = location === item.href || (item.href !== "/" && location.startsWith(item.href));
+        const isActive =
+          location === item.href ||
+          (item.href !== "/dashboard" && location.startsWith(item.href));
         return (
           <Link key={item.name} href={item.href} onClick={() => setMobileMenuOpen(false)}>
             <span
@@ -59,7 +61,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <SheetContent side="left" className="sm:max-w-xs">
             <nav className="grid gap-2 text-lg font-medium">
               <div className="flex h-14 items-center border-b px-2 font-semibold tracking-tight">
-                CRM
+                CRM Dashboard
               </div>
               <div className="py-4 grid gap-1">
                 <NavLinks />
@@ -80,7 +82,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden w-64 flex-col border-r bg-background md:flex">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 font-semibold tracking-tight">
-          CRM
+          CRM Dashboard
         </div>
         <div className="flex-1 overflow-auto py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-1">

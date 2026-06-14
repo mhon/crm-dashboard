@@ -1,0 +1,152 @@
+I already have a working CRM dashboard application built with Next.js and Supabase.
+
+Do NOT rebuild the existing CRM functionality.
+
+Instead, add a modern SaaS landing page as the public homepage (`/`) while keeping all existing routes and functionality intact.
+
+Requirements:
+
+1. Public Landing Page (`/`)
+   Create a professional SaaS landing page for a CRM application targeted at:
+
+* Online sellers
+* Facebook sellers
+* Shopee sellers
+* Small businesses
+* Resellers
+
+Hero Section:
+
+Headline:
+"Track Customers, Orders, and Profits in One Dashboard"
+
+Subheadline:
+"Stop using spreadsheets and Messenger chats to manage your business. Organize customers, monitor orders, and track revenue from a single dashboard."
+
+Primary Button:
+"Start Free"
+
+Secondary Button:
+"View Demo"
+
+The "Start Free" button should navigate to `/login`.
+
+The "View Demo" button should smoothly scroll to the Features section.
+
+2. Features Section
+
+Title:
+"Everything You Need To Manage Your Business"
+
+Cards:
+
+Customer Management
+
+* Store customer information
+* Search and manage customer records
+
+Order Tracking
+
+* Monitor order status
+* Track pending, paid, and shipped orders
+
+Profit Dashboard
+
+* View revenue summaries
+* Monitor business performance
+
+Reminders
+
+* Never forget unpaid balances
+* Track pending tasks
+
+3. Benefits Section
+
+Title:
+"Why Small Businesses Choose Our CRM"
+
+Include:
+
+* Save time
+* Stay organized
+* Track profits easily
+* Manage customers in one place
+
+4. Pricing Section
+
+Free Plan:
+
+* Up to 50 customers
+* Up to 100 orders
+* Basic dashboard
+
+Price:
+Free
+
+Pro Plan:
+
+* Unlimited customers
+* Unlimited orders
+* Advanced analytics
+* Priority support
+
+Price:
+₱199/month
+
+Business Plan:
+
+* Multi-user support
+* Team collaboration
+* Export reports
+
+Price:
+₱499/month
+
+5. Call To Action Section
+
+Headline:
+"Start Organizing Your Business Today"
+
+Button:
+"Create Free Account"
+
+Navigate to:
+`/login`
+
+6. Design Requirements
+
+* Modern SaaS style
+* Clean layout
+* Responsive mobile design
+* Tailwind CSS
+* Professional color palette
+* Smooth scrolling
+* Card-based sections
+* Good spacing and typography
+
+7. Navigation Bar
+
+Logo:
+CRM Dashboard
+
+Menu:
+
+* Features
+* Pricing
+* Login
+
+Login button:
+Navigate to `/login`
+
+8. Footer
+
+Include:
+
+* Product
+* Features
+* Pricing
+* Contact
+
+Keep the existing CRM dashboard, authentication, Supabase integration, and database functionality unchanged.
+
+Only add the landing page and marketing sections.

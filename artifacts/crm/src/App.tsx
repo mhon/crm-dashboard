@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 // Pages
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
+import LandingPage from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
 import CustomerDetail from "@/pages/customer-detail";
@@ -58,7 +59,7 @@ function LoginRoute() {
   }
 
   if (session && location === "/login") {
-    return <Redirect to="/" />;
+    return <Redirect to="/dashboard" />;
   }
 
   return <Login />;
@@ -67,8 +68,9 @@ function LoginRoute() {
 function Router() {
   return (
     <Switch>
+      <Route path="/" component={LandingPage} />
       <Route path="/login" component={LoginRoute} />
-      <Route path="/">
+      <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
       </Route>
       <Route path="/customers">
