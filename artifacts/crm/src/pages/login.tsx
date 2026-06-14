@@ -53,7 +53,7 @@ function SignInForm() {
     if (error) {
       setError(error.message);
     } else {
-      setLocation("/");
+      setLocation("/dashboard");
     }
     setIsLoading(false);
   }

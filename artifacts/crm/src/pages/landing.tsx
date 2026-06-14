@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,8 +18,10 @@ import {
   X,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LandingPage() {
+  const { session, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -32,6 +34,10 @@ export default function LandingPage() {
   }, []);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  if (!loading && session) {
+    return <Redirect to="/dashboard" />;
+  }
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
