@@ -1,12 +1,13 @@
 import { Router, type IRouter } from "express";
-import { supabase } from "../lib/supabase";
+import { getClient } from "../lib/supabase";
 
 const router: IRouter = Router();
 
 router.get("/dashboard/summary", async (req, res) => {
+  const db = getClient(req);
   const [customersRes, ordersRes] = await Promise.all([
-    supabase.from("customers").select("id, created_at"),
-    supabase.from("orders").select("id, amount, status"),
+    db.from("customers").select("id, created_at"),
+    db.from("orders").select("id, amount, status"),
   ]);
 
   if (customersRes.error) {
@@ -38,7 +39,8 @@ router.get("/dashboard/summary", async (req, res) => {
 });
 
 router.get("/dashboard/recent-orders", async (req, res) => {
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("orders")
     .select("*, customers(name)")
     .order("created_at", { ascending: false })
@@ -59,7 +61,8 @@ router.get("/dashboard/recent-orders", async (req, res) => {
 });
 
 router.get("/dashboard/order-status-breakdown", async (req, res) => {
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("orders")
     .select("status");
 

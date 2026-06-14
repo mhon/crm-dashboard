@@ -5,6 +5,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2 } from "lucide-react";
+import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { supabase } from "@/lib/supabase";
+
+setAuthTokenGetter(async () => {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
+});
 
 // Pages
 import NotFound from "@/pages/not-found";

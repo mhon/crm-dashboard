@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { supabase } from "../lib/supabase";
+import { getClient } from "../lib/supabase";
 import {
   ListNotesQueryParams,
   CreateNoteBody,
@@ -10,7 +10,8 @@ const router: IRouter = Router();
 
 router.get("/notes", async (req, res) => {
   const query = ListNotesQueryParams.parse(req.query);
-  let qb = supabase.from("notes").select("*").order("created_at", { ascending: false });
+  const db = getClient(req);
+  let qb = db.from("notes").select("*").order("created_at", { ascending: false });
   if (query.customer_id) {
     qb = qb.eq("customer_id", query.customer_id);
   }
@@ -24,7 +25,8 @@ router.get("/notes", async (req, res) => {
 
 router.post("/notes", async (req, res) => {
   const body = CreateNoteBody.parse(req.body);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("notes")
     .insert(body)
     .select()
@@ -38,7 +40,8 @@ router.post("/notes", async (req, res) => {
 
 router.delete("/notes/:id", async (req, res) => {
   const { id } = DeleteNoteParams.parse(req.params);
-  const { error } = await supabase.from("notes").delete().eq("id", id);
+  const db = getClient(req);
+  const { error } = await db.from("notes").delete().eq("id", id);
   if (error) {
     req.log.error({ error }, "Failed to delete note");
     return res.status(500).json({ error: error.message });

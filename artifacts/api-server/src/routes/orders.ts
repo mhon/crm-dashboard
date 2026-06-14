@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { supabase } from "../lib/supabase";
+import { getClient } from "../lib/supabase";
 import {
   ListOrdersQueryParams,
   CreateOrderBody,
@@ -13,7 +13,8 @@ const router: IRouter = Router();
 
 router.get("/orders", async (req, res) => {
   const query = ListOrdersQueryParams.parse(req.query);
-  let qb = supabase
+  const db = getClient(req);
+  let qb = db
     .from("orders")
     .select("*, customers(name)")
     .order("created_at", { ascending: false });
@@ -39,7 +40,8 @@ router.get("/orders", async (req, res) => {
 router.post("/orders", async (req, res) => {
   const body = CreateOrderBody.parse(req.body);
   const insert = { ...body, status: body.status ?? "pending" };
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("orders")
     .insert(insert)
     .select()
@@ -53,7 +55,8 @@ router.post("/orders", async (req, res) => {
 
 router.get("/orders/:id", async (req, res) => {
   const { id } = GetOrderParams.parse(req.params);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("orders")
     .select("*, customers(name)")
     .eq("id", id)
@@ -69,7 +72,8 @@ router.get("/orders/:id", async (req, res) => {
 router.patch("/orders/:id", async (req, res) => {
   const { id } = UpdateOrderParams.parse(req.params);
   const body = UpdateOrderBody.parse(req.body);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("orders")
     .update(body)
     .eq("id", id)
@@ -84,7 +88,8 @@ router.patch("/orders/:id", async (req, res) => {
 
 router.delete("/orders/:id", async (req, res) => {
   const { id } = DeleteOrderParams.parse(req.params);
-  const { error } = await supabase.from("orders").delete().eq("id", id);
+  const db = getClient(req);
+  const { error } = await db.from("orders").delete().eq("id", id);
   if (error) {
     req.log.error({ error }, "Failed to delete order");
     return res.status(500).json({ error: error.message });

@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { supabase } from "../lib/supabase";
+import { getClient } from "../lib/supabase";
 import {
   ListCustomersQueryParams,
   CreateCustomerBody,
@@ -13,7 +13,8 @@ const router: IRouter = Router();
 
 router.get("/customers", async (req, res) => {
   const query = ListCustomersQueryParams.parse(req.query);
-  let qb = supabase.from("customers").select("*").order("created_at", { ascending: false });
+  const db = getClient(req);
+  let qb = db.from("customers").select("*").order("created_at", { ascending: false });
   if (query.search) {
     qb = qb.or(`name.ilike.%${query.search}%,email.ilike.%${query.search}%`);
   }
@@ -27,7 +28,8 @@ router.get("/customers", async (req, res) => {
 
 router.post("/customers", async (req, res) => {
   const body = CreateCustomerBody.parse(req.body);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("customers")
     .insert(body)
     .select()
@@ -41,7 +43,8 @@ router.post("/customers", async (req, res) => {
 
 router.get("/customers/:id", async (req, res) => {
   const { id } = GetCustomerParams.parse(req.params);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("customers")
     .select("*")
     .eq("id", id)
@@ -55,7 +58,8 @@ router.get("/customers/:id", async (req, res) => {
 router.patch("/customers/:id", async (req, res) => {
   const { id } = UpdateCustomerParams.parse(req.params);
   const body = UpdateCustomerBody.parse(req.body);
-  const { data, error } = await supabase
+  const db = getClient(req);
+  const { data, error } = await db
     .from("customers")
     .update(body)
     .eq("id", id)
@@ -70,7 +74,8 @@ router.patch("/customers/:id", async (req, res) => {
 
 router.delete("/customers/:id", async (req, res) => {
   const { id } = DeleteCustomerParams.parse(req.params);
-  const { error } = await supabase.from("customers").delete().eq("id", id);
+  const db = getClient(req);
+  const { error } = await db.from("customers").delete().eq("id", id);
   if (error) {
     req.log.error({ error }, "Failed to delete customer");
     return res.status(500).json({ error: error.message });

@@ -1,0 +1,187 @@
+Redesign the landing page into a premium SaaS experience.
+
+Design requirements:
+
+* Modern SaaS aesthetic inspired by Linear, Stripe, Raycast, Notion, and Vercel.
+* Dark mode as the default theme.
+* Animated gradient background.
+* Glassmorphism cards with blur effects.
+* Fully responsive mobile and desktop layout.
+* Smooth scroll animations and fade-in effects.
+* Modern typography using Inter font.
+* High contrast CTA buttons.
+* Premium startup feel.
+* Fast loading and SEO friendly.
+
+Hero Section
+
+Headline:
+"Stop Losing Customers in Messenger"
+
+Subheadline:
+"Manage customers, orders, profits, and follow-ups in one dashboard. Built for online sellers, resellers, and small businesses."
+
+Primary Button:
+Start Free
+
+Secondary Button:
+Watch Demo
+
+Add a large dashboard preview mockup below the hero section.
+
+Features Section
+
+Display visually appealing feature cards:
+
+* Customer Management
+  Store and organize customer information in one place.
+
+* Order Tracking
+  Monitor pending, shipped, completed, and cancelled orders.
+
+* Profit Analytics
+  Track revenue, expenses, and profits in real time.
+
+* Payment Reminders
+  Never forget unpaid invoices and follow-ups.
+
+* Dashboard Overview
+  See all business metrics in one screen.
+
+* Mobile Friendly
+  Access your CRM anywhere.
+
+Why Sellers Switch
+
+Create a comparison section.
+
+Before:
+
+* Messenger chats everywhere
+* Excel spreadsheets
+* Manual order tracking
+* Missed follow-ups
+* Lost customer records
+
+After:
+
+* Centralized CRM Dashboard
+* Order Tracking System
+* Revenue Monitoring
+* Automated Reminders
+* Organized Customer Database
+
+Statistics Section
+
+Add animated counters:
+
+* 500+ Customers Managed
+* ₱120,000 Revenue Tracked
+* 98 Orders Processed
+* 95% Faster Customer Follow-up
+
+Who It's For
+
+Create modern cards for:
+
+* Online Sellers
+* Shopee Sellers
+* Lazada Sellers
+* Facebook Sellers
+* Resellers
+* Small Business Owners
+
+Demo Section
+
+Title:
+Try the Dashboard Before You Sign Up
+
+Button:
+Try Demo Account
+
+Include a realistic dashboard preview.
+
+Pricing Section
+
+Title:
+Simple Pricing
+
+Starter Plan
+
+₱199/month
+
+Includes:
+
+* Customer Management
+* Order Tracking
+* Basic Reports
+* Mobile Access
+
+Button:
+Start Free Trial
+
+Pro Plan
+
+₱499/month
+
+Includes:
+
+* Everything in Starter
+* Profit Analytics
+* Advanced Reports
+* Payment Reminders
+* Priority Support
+
+Button:
+Get Pro
+
+Footer
+
+About
+
+We help small businesses manage customers, orders, and profits without complicated software.
+
+Our goal is to provide an affordable and easy-to-use CRM solution for entrepreneurs, resellers, and online sellers.
+
+Features
+
+* Customer Management
+* Order Tracking
+* Profit Analytics
+* Payment Reminders
+* Dashboard Reports
+* Mobile Friendly
+
+Pricing
+
+Starter Plan — ₱199/month
+
+Pro Plan — ₱499/month
+
+Contact
+
+Email:
+[mhonbastasa@yahoo.com.ph](mailto:mhonbastasa@yahoo.com.ph)
+
+Footer Links:
+
+* About
+* Features
+* Pricing
+* Contact
+* Privacy Policy
+* Terms of Service
+
+Visual Enhancements
+
+* Floating gradient blobs
+* Glassmorphism cards
+* Smooth hover effects
+* Animated buttons
+* Scroll-triggered animations
+* Premium icon set
+* Modern SaaS illustrations
+* Dark theme with purple/blue accent colors
+* Professional spacing and typography
+
+The final result should feel like a premium startup SaaS product that users immediately trust and remember.
