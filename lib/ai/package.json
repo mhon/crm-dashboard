@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.9",
+    "@openrouter/ai-sdk-provider": "^3.0.0",
     "ai": "^7.0.18",
     "zod": "catalog:"
   }
