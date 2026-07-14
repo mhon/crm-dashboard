@@ -199,7 +199,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {recentOrders?.map((order) => (
+                {recentOrders?.map((order: any) => (
                   <div key={order.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                     <div>
                       <p className="font-medium">{order.product_name}</p>

@@ -231,7 +231,7 @@ export default function Leads() {
             <p>Try adjusting your search or add a new lead.</p>
           </div>
         ) : (
-          filteredLeads?.map((lead) => (
+          filteredLeads?.map((lead: any) => (
             <Card key={lead.id} className="overflow-hidden hover:border-primary/50 transition-colors">
               <CardContent className="p-0">
                 <div className="p-6">

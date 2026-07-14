@@ -198,7 +198,7 @@ export default function Companies() {
             <p>Try adjusting your search or add a new company.</p>
           </div>
         ) : (
-          filteredCompanies?.map((company) => (
+          filteredCompanies?.map((company: any) => (
             <Card key={company.id} className="overflow-hidden hover:border-primary/50 transition-colors">
               <CardContent className="p-0">
                 <div className="p-6">

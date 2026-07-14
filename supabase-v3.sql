@@ -32,14 +32,9 @@ CREATE POLICY "Enable read access for all authenticated users on workflows"
 ON public.workflows FOR SELECT
 TO authenticated USING (true);
 
-CREATE POLICY "Enable all access for admin on workflows"
+CREATE POLICY "Enable all access for authenticated users on workflows"
 ON public.workflows FOR ALL
-TO authenticated USING (
-  EXISTS (
-    SELECT 1 FROM public.user_profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  )
-);
+TO authenticated USING (true) WITH CHECK (true);
 
 CREATE POLICY "Enable all access for all authenticated users on workflow runs"
 ON public.workflow_runs FOR ALL

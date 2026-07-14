@@ -127,7 +127,7 @@ export default function Workflows() {
             <p className="text-muted-foreground mt-1">Create your first automation to save time.</p>
           </div>
         ) : (
-          workflows?.map((wf) => (
+          workflows?.map((wf: any) => (
             <Card key={wf.id} className="overflow-hidden hover:border-primary/50 transition-colors">
               <CardContent className="p-0">
                 <div className="p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

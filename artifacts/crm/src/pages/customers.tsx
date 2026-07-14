@@ -214,7 +214,7 @@ export default function Customers() {
             <p>Try adjusting your search or add a new customer.</p>
           </div>
         ) : (
-          customers?.map((customer) => (
+          customers?.map((customer: any) => (
             <Card key={customer.id} className="overflow-hidden hover:border-primary/50 transition-colors">
               <CardContent className="p-0">
                 <div className="p-6">

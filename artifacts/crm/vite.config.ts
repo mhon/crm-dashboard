@@ -28,7 +28,7 @@ export default defineConfig({
       process.env.SUPABASE_ANON_KEY ?? "",
     ),
     "import.meta.env.VITE_API_URL": JSON.stringify(
-      process.env.VITE_API_URL ?? "http://localhost:3001",
+      process.env.VITE_API_URL ?? "",
     ),
   },
   plugins: [
@@ -71,7 +71,7 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: process.env.VITE_API_URL ?? "http://localhost:3001",
+        target: process.env.VITE_API_URL ?? "http://localhost:8080",
         changeOrigin: true,
       },
     },

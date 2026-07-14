@@ -178,7 +178,7 @@ export default function Tasks() {
             <p>Try adjusting your search or add a new task.</p>
           </div>
         ) : (
-          filteredTasks?.map((task) => (
+          filteredTasks?.map((task: any) => (
             <Card key={task.id} className="overflow-hidden hover:border-primary/50 transition-colors">
               <CardContent className="p-0">
                 <div className="p-6">

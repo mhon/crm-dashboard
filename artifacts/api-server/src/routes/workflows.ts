@@ -6,6 +6,21 @@ const router = Router();
 
 router.use(requireAuth);
 
+/** Transform Supabase snake_case → camelCase to match the OpenAPI Workflow schema */
+function toWorkflow(row: Record<string, unknown>) {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    triggerEvent: row.trigger_event,
+    triggerConditions: row.trigger_conditions,
+    actions: row.actions,
+    isActive: row.is_active,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 router.get("/", async (req, res) => {
   try {
     const db = getClient(req);
@@ -19,7 +34,7 @@ router.get("/", async (req, res) => {
       return res.status(500).json({ error: "Failed to fetch workflows" });
     }
 
-    return res.json(data);
+    return res.json((data ?? []).map(toWorkflow));
   } catch (error: any) {
     req.log.error({ error }, "Error fetching workflows");
     return res.status(500).json({ error: "Internal Server Error" });
@@ -53,7 +68,7 @@ router.post("/", async (req, res) => {
       return res.status(500).json({ error: "Failed to create workflow" });
     }
 
-    return res.status(201).json(data);
+    return res.status(201).json(data ? toWorkflow(data as Record<string, unknown>) : null);
   } catch (error: any) {
     req.log.error({ error }, "Error creating workflow");
     return res.status(500).json({ error: "Internal Server Error" });

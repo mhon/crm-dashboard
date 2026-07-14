@@ -1,10 +1,3 @@
-import * as dotenv from "dotenv";
-import path from "path";
-
-// Load environment variables from the root .env file
-dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
-dotenv.config(); // also attempt to load from local .env just in case
-
 import app from "./app";
 import { logger } from "./lib/logger";
 
