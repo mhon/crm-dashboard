@@ -43,4 +43,8 @@ export * from './workflowActionsItem';
 export * from './workflowInput';
 export * from './workflowInputActionsItem';
 export * from './workflowInputTriggerConditions';
+export * from './workflowRun';
+export * from './workflowRunLogs';
+export * from './workflowRunStatus';
+export * from './workflowRunTriggerData';
 export * from './workflowTriggerConditions';

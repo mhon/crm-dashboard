@@ -701,12 +701,31 @@ paths:
             schema:
               $ref: "#/components/schemas/WorkflowInput"
       responses:
-        "200":
+        "201":
           description: Workflow created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+
+  /workflows/{id}/run:
+    post:
+      operationId: runWorkflow
+      tags: [workflows]
+      summary: Test run a workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workflow run result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowRun"
 
 components:
   schemas:
@@ -755,6 +774,27 @@ components:
             type: object
         isActive:
           type: boolean
+    WorkflowRun:
+      type: object
+      required: [id, workflowId, status, startedAt]
+      properties:
+        id:
+          type: string
+        workflowId:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        triggerData:
+          type: object
+        logs:
+          type: object
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
     LeadScoreInput:
       type: object
       required: [leadData]

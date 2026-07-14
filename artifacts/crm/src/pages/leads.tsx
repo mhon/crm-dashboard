@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -33,7 +32,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Search, Plus, Mail, Phone, Loader2, Target, BarChart, Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Plus, Mail, Phone, Loader2, Target, BarChart, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -49,6 +55,8 @@ const leadSchema = z.object({
 export default function Leads() {
   const [search, setSearch] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -61,12 +69,12 @@ export default function Leads() {
 
   const form = useForm<z.infer<typeof leadSchema>>({
     resolver: zodResolver(leadSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      status: "new",
-    },
+    defaultValues: { name: "", email: "", phone: "", status: "new" },
+  });
+
+  const editForm = useForm<z.infer<typeof leadSchema>>({
+    resolver: zodResolver(leadSchema),
+    defaultValues: { name: "", email: "", phone: "", status: "new" },
   });
 
   const generateLeadScore = useGenerateLeadScore();
@@ -92,7 +100,7 @@ export default function Leads() {
         onError: () => {
           setScoringLeadId(null);
           toast({ variant: "destructive", title: "Error", description: "Failed to score lead." });
-        }
+        },
       }
     );
   };
@@ -112,6 +120,44 @@ export default function Leads() {
     );
   };
 
+  const handleOpenEdit = (lead: any) => {
+    setSelectedLead(lead);
+    editForm.reset({
+      name: lead.name ?? "",
+      email: lead.email ?? "",
+      phone: lead.phone ?? "",
+      status: lead.status ?? "new",
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = (values: z.infer<typeof leadSchema>) => {
+    if (!selectedLead) return;
+    updateLead.mutate(
+      {
+        id: selectedLead.id,
+        data: {
+          name: values.name,
+          email: values.email,
+          phone: values.phone ?? undefined,
+          status: values.status,
+          ai_score: selectedLead.ai_score ?? undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
+          setIsEditOpen(false);
+          setSelectedLead(null);
+          toast({ title: "Lead updated", description: "Changes saved successfully." });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Error", description: "Failed to update lead." });
+        },
+      }
+    );
+  };
+
   function onSubmit(values: z.infer<typeof leadSchema>) {
     createLead.mutate(
       { data: values },
@@ -120,24 +166,20 @@ export default function Leads() {
           queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
           setIsCreateOpen(false);
           form.reset();
-          toast({
-            title: "Lead created",
-            description: "The lead has been added successfully.",
-          });
+          toast({ title: "Lead created", description: "The lead has been added successfully." });
         },
         onError: () => {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to create lead.",
-          });
+          toast({ variant: "destructive", title: "Error", description: "Failed to create lead." });
         },
       }
     );
   }
 
-  const filteredLeads = leads.filter((lead: any) => 
-    search === "" || lead.name.toLowerCase().includes(search.toLowerCase()) || lead.email.toLowerCase().includes(search.toLowerCase())
+  const filteredLeads = leads.filter(
+    (lead: any) =>
+      search === "" ||
+      lead.name.toLowerCase().includes(search.toLowerCase()) ||
+      lead.email.toLowerCase().includes(search.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -162,7 +204,8 @@ export default function Leads() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
+        {/* Create Lead Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto">
@@ -173,9 +216,7 @@ export default function Leads() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Lead</DialogTitle>
-              <DialogDescription>
-                Create a new prospect. Click save when you're done.
-              </DialogDescription>
+              <DialogDescription>Create a new prospect. Click save when you're done.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -218,6 +259,29 @@ export default function Leads() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="new">New</SelectItem>
+                          <SelectItem value="contacted">Contacted</SelectItem>
+                          <SelectItem value="qualified">Qualified</SelectItem>
+                          <SelectItem value="lost">Lost</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <DialogFooter>
                   <Button type="submit" disabled={createLead.isPending}>
                     {createLead.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -229,6 +293,88 @@ export default function Leads() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit Lead Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={(open) => { setIsEditOpen(open); if (!open) setSelectedLead(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Lead</DialogTitle>
+            <DialogDescription>Update the lead's details and status.</DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-4">
+              <FormField
+                control={editForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John Doe" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="john@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editForm.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="contacted">Contacted</SelectItem>
+                        <SelectItem value="qualified">Qualified</SelectItem>
+                        <SelectItem value="lost">Lost</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button type="submit" disabled={updateLead.isPending}>
+                  {updateLead.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
@@ -257,14 +403,12 @@ export default function Leads() {
               <CardContent className="p-0">
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="font-semibold text-lg cursor-pointer truncate pr-4">
-                      {lead.name}
-                    </h3>
-                    <Badge className={`${getStatusColor(lead.status)} border-0 hover:bg-transparent`}>
+                    <h3 className="font-semibold text-lg truncate pr-4">{lead.name}</h3>
+                    <Badge className={`${getStatusColor(lead.status)} border-0 hover:bg-transparent flex-shrink-0`}>
                       {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
                     </Badge>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 flex-shrink-0" />
@@ -279,17 +423,26 @@ export default function Leads() {
                     {lead.ai_score !== undefined && lead.ai_score !== null && (
                       <div className="flex items-center gap-2 text-primary font-medium mt-2">
                         <BarChart className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">AI Score: {lead.ai_score}</span>
+                        <span>AI Score: {lead.ai_score}/100</span>
                       </div>
                     )}
                   </div>
                 </div>
+
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center gap-2">
-                  <span>Added {format(new Date(lead.created_at), 'MMM d, yyyy')}</span>
+                  <span>Added {format(new Date(lead.created_at), "MMM d, yyyy")}</span>
                   <div className="flex items-center gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleOpenEdit(lead)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="h-8 text-primary hover:text-primary/80"
                       onClick={() => handleScoreLead(lead)}
                       disabled={scoringLeadId === lead.id}

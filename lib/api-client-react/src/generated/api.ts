@@ -48,7 +48,8 @@ import type {
   Task,
   TaskInput,
   Workflow,
-  WorkflowInput
+  WorkflowInput,
+  WorkflowRun
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -2902,5 +2903,76 @@ export const useCreateWorkflow = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreateWorkflowMutationOptions(options));
+    }
+
+export const getRunWorkflowUrl = (id: string,) => {
+
+
+
+
+  return `/api/workflows/${id}/run`
+}
+
+/**
+ * @summary Test run a workflow
+ */
+export const runWorkflow = async (id: string, options?: RequestInit): Promise<WorkflowRun> => {
+
+  return customFetch<WorkflowRun>(getRunWorkflowUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRunWorkflowMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runWorkflow>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runWorkflow>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['runWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runWorkflow>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  runWorkflow(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof runWorkflow>>>
+
+    export type RunWorkflowMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Test run a workflow
+ */
+export const useRunWorkflow = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runWorkflow>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runWorkflow>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getRunWorkflowMutationOptions(options));
     }
 

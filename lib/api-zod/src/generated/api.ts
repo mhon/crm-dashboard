@@ -691,3 +691,25 @@ export const CreateWorkflowResponse = zod.object({
 })
 
 
+/**
+ * @summary Test run a workflow
+ */
+export const RunWorkflowParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const RunWorkflowResponse = zod.object({
+  "id": zod.string(),
+  "workflowId": zod.string(),
+  "status": zod.enum(['pending', 'running', 'completed', 'failed']),
+  "triggerData": zod.object({
+
+}).optional(),
+  "logs": zod.object({
+
+}).optional(),
+  "startedAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date().optional()
+})
+
+

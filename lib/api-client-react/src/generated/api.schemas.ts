@@ -34,6 +34,30 @@ export interface WorkflowInput {
   isActive?: boolean;
 }
 
+export type WorkflowRunStatus = typeof WorkflowRunStatus[keyof typeof WorkflowRunStatus];
+
+
+export const WorkflowRunStatus = {
+  pending: 'pending',
+  running: 'running',
+  completed: 'completed',
+  failed: 'failed',
+} as const;
+
+export type WorkflowRunTriggerData = { [key: string]: unknown };
+
+export type WorkflowRunLogs = { [key: string]: unknown };
+
+export interface WorkflowRun {
+  id: string;
+  workflowId: string;
+  status: WorkflowRunStatus;
+  triggerData?: WorkflowRunTriggerData;
+  logs?: WorkflowRunLogs;
+  startedAt: string;
+  completedAt?: string;
+}
+
 export type LeadScoreInputLeadData = { [key: string]: unknown };
 
 export interface LeadScoreInput {

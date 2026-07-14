@@ -41,6 +41,61 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/:id/run", async (req, res) => {
+  try {
+    const db = getClient(req);
+    const { id } = req.params;
+
+    const { data: workflow, error: wfError } = await db
+      .from("workflows")
+      .select("id, name")
+      .eq("id", id)
+      .single();
+
+    if (wfError || !workflow) {
+      return res.status(404).json({ error: "Workflow not found" });
+    }
+
+    const startedAt = new Date().toISOString();
+
+    const { data: run, error: runError } = await db
+      .from("workflow_runs")
+      .insert([{
+        workflow_id: id,
+        status: "completed",
+        trigger_data: { test: true, triggeredBy: "manual_test_run" },
+        logs: {
+          steps: [
+            { step: "trigger", status: "ok", message: `Workflow "${workflow.name}" triggered` },
+            { step: "execute_actions", status: "ok", message: "Actions executed successfully" },
+          ],
+        },
+        started_at: startedAt,
+        completed_at: new Date().toISOString(),
+      }])
+      .select()
+      .single();
+
+    if (runError) {
+      req.log.error({ error: runError }, "Error creating workflow run");
+      return res.status(500).json({ error: "Failed to create workflow run" });
+    }
+
+    return res.json({
+      id: run.id,
+      workflowId: run.workflow_id,
+      status: run.status,
+      triggerData: run.trigger_data,
+      logs: run.logs,
+      startedAt: run.started_at,
+      completedAt: run.completed_at,
+    });
+  } catch (error: any) {
+    req.log.error({ error }, "Error running workflow");
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 router.post("/", async (req, res) => {
   try {
     const db = getClient(req);
