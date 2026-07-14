@@ -6,15 +6,27 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './company';
+export * from './companyInput';
 export * from './customer';
 export * from './customerInput';
 export * from './customerUpdate';
 export * from './dashboardSummary';
+export * from './emailDraftInput';
+export * from './generateEmailDraft200';
+export * from './generateLeadScore200';
+export * from './generateMeetingSummary200';
+export * from './getAnalyticsSummary200';
 export * from './healthStatus';
+export * from './lead';
+export * from './leadInput';
+export * from './leadScoreInput';
+export * from './leadScoreInputLeadData';
 export * from './listCustomersParams';
 export * from './listNotesParams';
 export * from './listOrdersParams';
 export * from './listOrdersStatus';
+export * from './meetingSummaryInput';
 export * from './note';
 export * from './noteInput';
 export * from './order';
@@ -24,3 +36,11 @@ export * from './orderStatus';
 export * from './orderStatusBreakdown';
 export * from './orderUpdate';
 export * from './orderUpdateStatus';
+export * from './task';
+export * from './taskInput';
+export * from './workflow';
+export * from './workflowActionsItem';
+export * from './workflowInput';
+export * from './workflowInputActionsItem';
+export * from './workflowInputTriggerConditions';
+export * from './workflowTriggerConditions';

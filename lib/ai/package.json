@@ -1,0 +1,14 @@
+{
+  "name": "@workspace/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.9",
+    "ai": "^7.0.18",
+    "zod": "catalog:"
+  }
+}

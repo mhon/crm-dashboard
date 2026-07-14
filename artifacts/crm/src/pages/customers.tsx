@@ -54,10 +54,11 @@ export default function Customers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: customers, isLoading } = useListCustomers(
+  const { data: customersData, isLoading } = useListCustomers(
     { search: search || undefined },
     { query: { queryKey: getListCustomersQueryKey({ search: search || undefined }) } }
   );
+  const customers = Array.isArray(customersData) ? customersData : (customersData as any)?.customers ?? (customersData as any)?.data ?? [];
 
   const createCustomer = useCreateCustomer();
   const deleteCustomer = useDeleteCustomer();

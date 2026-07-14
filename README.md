@@ -1,42 +1,73 @@
-# CRM Dashboard
+# CRM Dashboard + Landing Page (SaaS-ready)
 
-A full-stack Customer Relationship Management (CRM) web app built with **React + Vite**, **Express**, and **Supabase** — featuring authentication, customer management, order tracking, and notes.
+A full-stack Customer Relationship Management (CRM) web app built with **React + Vite**, **Express**, and **Supabase**, designed as a **SaaS-ready product for small businesses, resellers, and online sellers**.
+
+Includes a **marketing landing page, demo flow, and conversion-focused UI**.
 
 ![CRM Dashboard](https://img.shields.io/badge/Stack-React%20%2B%20Vite%20%2B%20Supabase-blue)
+![SaaS Ready](https://img.shields.io/badge/Product-SaaS%20Ready-purple)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
-## Features
+## 🌐 Live Demo Flow
 
-### Authentication
+- 🏠 Landing Page → explains product value
+- ▶️ Watch Demo → short video (30–40 sec) showing CRM usage
+- 🔐 Login / Register → Supabase authentication
+- 📊 Dashboard → CRM system (customers, orders, revenue)
+
+## 🚀 Features
+
+### 🧲 Landing Page (Marketing Layer)
+- Hero Section:
+  - "Track Customers, Orders, and Profits in One Dashboard"
+  - CTA buttons: **Start Free / View Demo**
+- Modern responsive UI (mobile-first)
+- Sections:
+  - Features overview
+  - Pricing plans
+  - About / Company mission
+  - Footer (contact + links)
+- Demo video integration (Canva / MP4 / YouTube embed)
+
+### 🔐 Authentication
 - Email/password login and registration via **Supabase Auth**
 - Protected dashboard routes — unauthenticated users are redirected to login
 - Session persistence across page refreshes
 
-### Dashboard
+### 📊 CRM Dashboard
 - Summary cards: total customers, total orders, total revenue, new customers this month
 - Recent orders table
 - Order status breakdown (pending / paid / shipped)
 
-### Customers
+### 👥 Customers
 - List all customers with **live search** (by name or email)
 - Create, edit, and delete customers
 - Customer detail page with their orders and notes
 
-### Orders
+### 📦 Orders Module
 - List all orders with **filter by status** (pending / paid / shipped)
 - Create, edit, delete orders
 - Update order status inline
 - Orders linked to customers
 
-### Notes
+### 📝 Notes
 - Add and delete notes per customer
 - Displayed on the customer detail page
 
+- ## 💰 SaaS Monetization Model (Planned)
+
+- Free tier (limited customers/orders)
+- Pro plan
+- Premium features:
+  - analytics dashboard
+  - export reports
+  - unlimited records
+
 ---
 
-## Tech Stack
+## 🧠 Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -52,7 +83,7 @@ A full-stack Customer Relationship Management (CRM) web app built with **React +
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 ├── artifacts/
@@ -75,7 +106,7 @@ A full-stack Customer Relationship Management (CRM) web app built with **React +
 
 ---
 
-## Database Schema
+## 🗄 Database Schema
 
 Run `supabase-setup.sql` in your Supabase SQL Editor to create:
 
@@ -134,7 +165,7 @@ Open [http://localhost:22444](http://localhost:22444) in your browser.
 
 ---
 
-## API Endpoints
+## 📦 API Endpoints
 
 | Method | Path | Description |
 |---|---|---|
@@ -165,7 +196,7 @@ pnpm --filter @workspace/api-spec run codegen  # Regenerate API hooks from OpenA
 
 ---
 
-## Deployment
+## 🌍 Deployment
 
 This project is ready to deploy on [Replit](https://replit.com). Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` as deployment secrets and click **Deploy**.
 
@@ -173,6 +204,7 @@ For other platforms (Railway, Render, Vercel + separate API), set the same two e
 
 ---
 
-## License
+## 📄 License
 
 MIT
+# Auto-deploy test

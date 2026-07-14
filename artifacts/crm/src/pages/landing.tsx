@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import {
   Users, Package, TrendingUp, Bell, LayoutDashboard, Smartphone,
-  CheckCircle2, XCircle, ArrowRight, Menu, X, Star, ChevronRight, Play,
+  CheckCircle2, XCircle, ArrowRight, Menu, X, Star, ChevronRight,
 } from "lucide-react";
 
 function useCountUp(target: number, duration = 2000, start = false) {
@@ -130,7 +130,6 @@ export default function LandingPage() {
   const { session, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
     const handler = () => setIsScrolled(window.scrollY > 20);
@@ -138,21 +137,10 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setShowVideo(false); };
-    if (showVideo) {
-      document.addEventListener("keydown", onKey);
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-  }, [showVideo]);
-
   if (!loading && session) return <Redirect to="/dashboard" />;
 
   return (
-    <div style={{ background: "#050814", color: "#e2e8f0", fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh" }}>
+    <div style={{ background: "#050814", color: "#e2e8f0", fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh", overflow: "hidden" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         html { scroll-behavior: smooth; }
@@ -160,11 +148,6 @@ export default function LandingPage() {
         @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-25px,15px) scale(1.03)} 66%{transform:translate(20px,-25px) scale(0.98)} }
         @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(15px,20px) scale(1.04)} }
         @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
-        @keyframes modalFadeIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
-        @keyframes backdropIn { from{opacity:0} to{opacity:1} }
-        .modal-backdrop { animation: backdropIn 0.25s ease forwards; }
-        .modal-box { animation: modalFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards; }
-        .modal-close:hover { background: rgba(255,255,255,0.15) !important; }
         @keyframes pulse-ring { 0%{transform:scale(1);opacity:1} 100%{transform:scale(1.4);opacity:0} }
         .blob1 { animation: float1 12s ease-in-out infinite; }
         .blob2 { animation: float2 15s ease-in-out infinite; }
@@ -239,13 +222,17 @@ export default function LandingPage() {
           background-size: 200% 200%;
           animation: gradientShift 6s ease infinite;
         }
+        @media (max-width: 768px) {
+          .mobile-menu-btn { display: block !important; }
+          .mock-bar { display: none; }
+        }
       `}</style>
 
       {/* Background blobs */}
       <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-        <div className="blob1" style={{ position: "absolute", top: "-20%", left: "-10%", width: "600px", height: "600px", borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)" }} />
-        <div className="blob2" style={{ position: "absolute", top: "30%", right: "-15%", width: "700px", height: "700px", borderRadius: "50%", background: "radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%)" }} />
-        <div className="blob3" style={{ position: "absolute", bottom: "-10%", left: "20%", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%)" }} />
+        <div className="blob1" style={{ position: "absolute", top: "-20%", left: "-10%", width: "min(600px, 80vw)", height: "min(600px, 80vw)", borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)" }} />
+        <div className="blob2" style={{ position: "absolute", top: "30%", right: "-15%", width: "min(700px, 90vw)", height: "min(700px, 90vw)", borderRadius: "50%", background: "radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%)" }} />
+        <div className="blob3" style={{ position: "absolute", bottom: "-10%", left: "20%", width: "min(500px, 70vw)", height: "min(500px, 70vw)", borderRadius: "50%", background: "radial-gradient(circle, rgba(6,182,212,0.10) 0%, transparent 70%)" }} />
       </div>
 
       {/* Navbar */}
@@ -256,39 +243,39 @@ export default function LandingPage() {
         borderBottom: isScrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
         transition: "all 0.3s ease",
       }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px", minHeight: "68px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(135deg,#7c3aed,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <TrendingUp size={16} color="white" />
             </div>
-            <span style={{ fontWeight: 700, fontSize: "18px", color: "white" }}>CRM Dashboard</span>
+            <span style={{ fontWeight: 700, fontSize: "16px", color: "white" }}>CRM</span>
           </div>
 
-          <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+          <div className="hidden md:flex" style={{ display: "none", alignItems: "center", gap: "32px" }}>
             {["Features", "Pricing", "Contact"].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="nav-link" style={{ fontSize: "14px", fontWeight: 500, color: "#94a3b8" }}>{item}</a>
             ))}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <Link href="/login">
-              <button className="outline-btn hidden md:block" style={{ padding: "8px 18px", borderRadius: "8px", fontSize: "14px", fontWeight: 500, color: "white", cursor: "pointer", background: "transparent" }}>
+              <button className="outline-btn hidden md:block" style={{ display: "none", padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 500, color: "white", cursor: "pointer", background: "transparent" }}>
                 Sign In
               </button>
             </Link>
             <Link href="/login">
-              <button className="cta-btn" style={{ padding: "8px 18px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
+              <button className="cta-btn" style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
                 <span>Start Free</span>
               </button>
             </Link>
-            <button onClick={() => setMobileOpen(!mobileOpen)} style={{ display: "none", background: "none", border: "none", color: "white", cursor: "pointer" }} className="md:hidden mobile-menu-btn">
-              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            <button onClick={() => setMobileOpen(!mobileOpen)} style={{ display: "flex", background: "none", border: "none", color: "white", cursor: "pointer", padding: "8px 4px" }} className="md:hidden mobile-menu-btn">
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
         {mobileOpen && (
-          <div style={{ background: "rgba(5,8,20,0.97)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "20px 24px" }}>
+          <div style={{ background: "rgba(5,8,20,0.97)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px", maxHeight: "calc(100vh - 68px)", overflowY: "auto" }}>
             {["Features", "Pricing", "Contact"].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)} style={{ display: "block", padding: "12px 0", color: "#94a3b8", fontSize: "16px", fontWeight: 500, textDecoration: "none" }}>{item}</a>
             ))}
@@ -331,14 +318,11 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </button>
             </Link>
-            <button
-              className="outline-btn"
-              onClick={() => setShowVideo(true)}
-              style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent", display: "flex", alignItems: "center", gap: "8px" }}
-            >
-              <Play size={16} fill="white" />
-              Watch Demo
-            </button>
+            <a href="#features">
+              <button className="outline-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent" }}>
+                Watch Demo
+              </button>
+            </a>
           </div>
         </FadeIn>
 
@@ -589,7 +573,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer id="contact" style={{ position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "80px 24px 40px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr repeat(3, 1fr)", gap: "48px", marginBottom: "64px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "48px", marginBottom: "64px" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
                 <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(135deg,#7c3aed,#4f46e5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -629,7 +613,7 @@ export default function LandingPage() {
           </div>
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "32px", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
             <span style={{ fontSize: "13px", color: "#475569" }}>© 2025 CRM Dashboard. All rights reserved.</span>
-            <div style={{ display: "flex", gap: "24px" }}>
+            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
               {["About", "Features", "Pricing", "Contact"].map(l => (
                 <a key={l} href={`#${l.toLowerCase()}`} style={{ fontSize: "13px", color: "#475569", textDecoration: "none" }}>{l}</a>
               ))}
@@ -637,86 +621,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-
-      {/* Video Modal */}
-      {showVideo && (
-        <div
-          className="modal-backdrop"
-          onClick={() => setShowVideo(false)}
-          style={{
-            position: "fixed", inset: 0, zIndex: 9999,
-            background: "rgba(0,0,0,0.85)",
-            backdropFilter: "blur(8px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: "20px",
-          }}
-        >
-          <div
-            className="modal-box"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "900px",
-              background: "rgba(15,18,40,0.9)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "20px",
-              overflow: "hidden",
-              boxShadow: "0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(124,58,237,0.2)",
-            }}
-          >
-            {/* Modal header */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "16px 20px",
-              borderBottom: "1px solid rgba(255,255,255,0.07)",
-              background: "rgba(255,255,255,0.03)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{
-                  width: "28px", height: "28px", borderRadius: "6px",
-                  background: "linear-gradient(135deg,#7c3aed,#4f46e5)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <Play size={12} color="white" fill="white" />
-                </div>
-                <span style={{ fontSize: "14px", fontWeight: 600, color: "#e2e8f0" }}>CRM Dashboard — Product Demo</span>
-              </div>
-              <button
-                className="modal-close"
-                onClick={() => setShowVideo(false)}
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "8px",
-                  width: "32px", height: "32px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", color: "#94a3b8",
-                  transition: "background 0.2s ease",
-                }}
-                aria-label="Close video"
-              >
-                <X size={16} />
-              </button>
-            </div>
-
-            {/* YouTube embed — unmounts on close to auto-pause */}
-            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0 }}>
-              <iframe
-                src="https://www.youtube.com/embed/7nXRy-Zms2s?autoplay=1&rel=0&modestbranding=1"
-                title="CRM Dashboard Demo"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                style={{
-                  position: "absolute", top: 0, left: 0,
-                  width: "100%", height: "100%",
-                  border: "none",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

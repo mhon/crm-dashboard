@@ -5,6 +5,51 @@
  * CRM API specification
  * OpenAPI spec version: 0.1.0
  */
+export type WorkflowTriggerConditions = { [key: string]: unknown };
+
+export type WorkflowActionsItem = { [key: string]: unknown };
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description?: string;
+  triggerEvent: string;
+  triggerConditions?: WorkflowTriggerConditions;
+  actions: WorkflowActionsItem[];
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type WorkflowInputTriggerConditions = { [key: string]: unknown };
+
+export type WorkflowInputActionsItem = { [key: string]: unknown };
+
+export interface WorkflowInput {
+  name: string;
+  description?: string;
+  triggerEvent: string;
+  triggerConditions?: WorkflowInputTriggerConditions;
+  actions: WorkflowInputActionsItem[];
+  isActive?: boolean;
+}
+
+export type LeadScoreInputLeadData = { [key: string]: unknown };
+
+export interface LeadScoreInput {
+  leadData: LeadScoreInputLeadData;
+}
+
+export interface EmailDraftInput {
+  recipientName: string;
+  purpose: string;
+  additionalInfo?: string;
+}
+
+export interface MeetingSummaryInput {
+  meetingNotes: string;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -114,6 +159,84 @@ export interface OrderStatusBreakdown {
   shipped: number;
 }
 
+export interface Company {
+  id: string;
+  name: string;
+  /** @nullable */
+  domain?: string | null;
+  /** @nullable */
+  industry?: string | null;
+  created_at: string;
+}
+
+export interface CompanyInput {
+  /** @minLength 1 */
+  name: string;
+  /** @nullable */
+  domain?: string | null;
+  /** @nullable */
+  industry?: string | null;
+}
+
+export interface Lead {
+  id: string;
+  /** @nullable */
+  company_id?: string | null;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  status: string;
+  /** @nullable */
+  ai_score?: number | null;
+  created_at: string;
+}
+
+export interface LeadInput {
+  /** @nullable */
+  company_id?: string | null;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  status?: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  due_date?: string | null;
+  status: string;
+  /** @nullable */
+  related_lead_id?: string | null;
+  /** @nullable */
+  related_customer_id?: string | null;
+  /** @nullable */
+  assigned_to?: string | null;
+  created_at: string;
+}
+
+export interface TaskInput {
+  /** @minLength 1 */
+  title: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  due_date?: string | null;
+  status?: string;
+  /** @nullable */
+  related_lead_id?: string | null;
+  /** @nullable */
+  related_customer_id?: string | null;
+  /** @nullable */
+  assigned_to?: string | null;
+}
+
 export type ListCustomersParams = {
 search?: string;
 };
@@ -134,5 +257,24 @@ export const ListOrdersStatus = {
 
 export type ListNotesParams = {
 customer_id?: string;
+};
+
+export type GenerateLeadScore200 = {
+  score?: number;
+  explanation?: string;
+};
+
+export type GenerateEmailDraft200 = {
+  draft?: string;
+};
+
+export type GenerateMeetingSummary200 = {
+  summary?: string;
+};
+
+export type GetAnalyticsSummary200 = {
+  mrr?: number;
+  pipelineValue?: number;
+  winRate?: number;
 };
 

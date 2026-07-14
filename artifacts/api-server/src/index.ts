@@ -1,13 +1,14 @@
+import * as dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from the root .env file
+dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
+dotenv.config(); // also attempt to load from local .env just in case
+
 import app from "./app";
 import { logger } from "./lib/logger";
 
-const rawPort = process.env["PORT"];
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+const rawPort = process.env["API_PORT"] || process.env["PORT"] || "3001";
 
 const port = Number(rawPort);
 

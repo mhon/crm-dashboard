@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, ShoppingCart, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, LogOut, Menu, Building2, Contact, ListTodo, BarChart3, Workflow } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 
@@ -12,14 +12,22 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    { name: "Companies", href: "/companies", icon: Building2 },
+    { name: "Leads", href: "/leads", icon: Contact },
     { name: "Customers", href: "/customers", icon: Users },
-    { name: "Orders", href: "/orders", icon: ShoppingCart },
+    { name: "Tasks", href: "/tasks", icon: ListTodo },
+    { name: "Workflows", href: "/workflows", icon: Workflow },
   ];
 
   const getPageTitle = () => {
     if (location === "/dashboard") return "Dashboard";
+    if (location === "/analytics") return "Analytics";
+    if (location === "/companies" || location.startsWith("/companies/")) return "Companies";
+    if (location === "/leads" || location.startsWith("/leads/")) return "Leads";
     if (location === "/customers" || location.startsWith("/customers/")) return "Customers";
-    if (location === "/orders") return "Orders";
+    if (location === "/tasks" || location.startsWith("/tasks/")) return "Tasks";
+    if (location === "/workflows" || location.startsWith("/workflows/")) return "Workflows";
     return "";
   };
 

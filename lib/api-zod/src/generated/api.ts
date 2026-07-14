@@ -256,3 +256,319 @@ export const GetOrderStatusBreakdownResponse = zod.object({
 })
 
 
+/**
+ * @summary List all companies
+ */
+export const ListCompaniesResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "domain": zod.string().nullish(),
+  "industry": zod.string().nullish(),
+  "created_at": zod.string()
+})
+export const ListCompaniesResponse = zod.array(ListCompaniesResponseItem)
+
+
+/**
+ * @summary Create a company
+ */
+
+
+
+export const CreateCompanyBody = zod.object({
+  "name": zod.string().min(1),
+  "domain": zod.string().nullish(),
+  "industry": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a company
+ */
+export const GetCompanyParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetCompanyResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "domain": zod.string().nullish(),
+  "industry": zod.string().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary List all leads
+ */
+export const ListLeadsResponseItem = zod.object({
+  "id": zod.string(),
+  "company_id": zod.string().nullish(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "status": zod.string(),
+  "ai_score": zod.number().nullish(),
+  "created_at": zod.string()
+})
+export const ListLeadsResponse = zod.array(ListLeadsResponseItem)
+
+
+/**
+ * @summary Create a lead
+ */
+
+
+
+
+export const CreateLeadBody = zod.object({
+  "company_id": zod.string().nullish(),
+  "name": zod.string().min(1),
+  "email": zod.string().min(1),
+  "phone": zod.string().nullish(),
+  "status": zod.string().optional()
+})
+
+
+/**
+ * @summary Get a lead
+ */
+export const GetLeadParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetLeadResponse = zod.object({
+  "id": zod.string(),
+  "company_id": zod.string().nullish(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "status": zod.string(),
+  "ai_score": zod.number().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary Update a lead
+ */
+export const UpdateLeadParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+
+
+
+export const UpdateLeadBody = zod.object({
+  "company_id": zod.string().nullish(),
+  "name": zod.string().min(1),
+  "email": zod.string().min(1),
+  "phone": zod.string().nullish(),
+  "status": zod.string().optional()
+})
+
+export const UpdateLeadResponse = zod.object({
+  "id": zod.string(),
+  "company_id": zod.string().nullish(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "status": zod.string(),
+  "ai_score": zod.number().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary List all tasks
+ */
+export const ListTasksResponseItem = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "due_date": zod.string().nullish(),
+  "status": zod.string(),
+  "related_lead_id": zod.string().nullish(),
+  "related_customer_id": zod.string().nullish(),
+  "assigned_to": zod.string().nullish(),
+  "created_at": zod.string()
+})
+export const ListTasksResponse = zod.array(ListTasksResponseItem)
+
+
+/**
+ * @summary Create a task
+ */
+
+
+
+export const CreateTaskBody = zod.object({
+  "title": zod.string().min(1),
+  "description": zod.string().nullish(),
+  "due_date": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "related_lead_id": zod.string().nullish(),
+  "related_customer_id": zod.string().nullish(),
+  "assigned_to": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a task
+ */
+export const GetTaskParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetTaskResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "due_date": zod.string().nullish(),
+  "status": zod.string(),
+  "related_lead_id": zod.string().nullish(),
+  "related_customer_id": zod.string().nullish(),
+  "assigned_to": zod.string().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary Update a task
+ */
+export const UpdateTaskParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+
+
+
+export const UpdateTaskBody = zod.object({
+  "title": zod.string().min(1),
+  "description": zod.string().nullish(),
+  "due_date": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "related_lead_id": zod.string().nullish(),
+  "related_customer_id": zod.string().nullish(),
+  "assigned_to": zod.string().nullish()
+})
+
+export const UpdateTaskResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "due_date": zod.string().nullish(),
+  "status": zod.string(),
+  "related_lead_id": zod.string().nullish(),
+  "related_customer_id": zod.string().nullish(),
+  "assigned_to": zod.string().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary Generate a score for a lead
+ */
+export const GenerateLeadScoreBody = zod.object({
+  "leadData": zod.object({
+
+}).passthrough()
+})
+
+export const GenerateLeadScoreResponse = zod.object({
+  "score": zod.number().optional(),
+  "explanation": zod.string().optional()
+})
+
+
+/**
+ * @summary Draft an email to a lead or customer
+ */
+export const GenerateEmailDraftBody = zod.object({
+  "recipientName": zod.string(),
+  "purpose": zod.string(),
+  "additionalInfo": zod.string().optional()
+})
+
+export const GenerateEmailDraftResponse = zod.object({
+  "draft": zod.string().optional()
+})
+
+
+/**
+ * @summary Summarize meeting notes
+ */
+export const GenerateMeetingSummaryBody = zod.object({
+  "meetingNotes": zod.string()
+})
+
+export const GenerateMeetingSummaryResponse = zod.object({
+  "summary": zod.string().optional()
+})
+
+
+/**
+ * @summary Get advanced analytics summary
+ */
+export const GetAnalyticsSummaryResponse = zod.object({
+  "mrr": zod.number().optional(),
+  "pipelineValue": zod.number().optional(),
+  "winRate": zod.number().optional()
+})
+
+
+/**
+ * @summary Get all workflows
+ */
+export const ListWorkflowsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "triggerEvent": zod.string(),
+  "triggerConditions": zod.object({
+
+}).passthrough().optional(),
+  "actions": zod.array(zod.object({
+
+}).passthrough()),
+  "isActive": zod.boolean().optional(),
+  "createdAt": zod.coerce.date().optional(),
+  "updatedAt": zod.coerce.date().optional()
+})
+export const ListWorkflowsResponse = zod.array(ListWorkflowsResponseItem)
+
+
+/**
+ * @summary Create a new workflow
+ */
+export const CreateWorkflowBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "triggerEvent": zod.string(),
+  "triggerConditions": zod.object({
+
+}).passthrough().optional(),
+  "actions": zod.array(zod.object({
+
+}).passthrough()),
+  "isActive": zod.boolean().optional()
+})
+
+export const CreateWorkflowResponse = zod.object({
+  "id": zod.string().uuid(),
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "triggerEvent": zod.string(),
+  "triggerConditions": zod.object({
+
+}).passthrough().optional(),
+  "actions": zod.array(zod.object({
+
+}).passthrough()),
+  "isActive": zod.boolean().optional(),
+  "createdAt": zod.coerce.date().optional(),
+  "updatedAt": zod.coerce.date().optional()
+})
+
+

@@ -5,8 +5,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2 } from "lucide-react";
-import { setAuthTokenGetter } from "@workspace/api-client-react";
+import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import { supabase } from "@/lib/supabase";
+
+// In development, Vite proxies /api to the Express server automatically.
+// In production, VITE_API_URL should point to your deployed API (e.g. Render, Railway).
+const apiUrl = import.meta.env.VITE_API_URL;
+if (apiUrl) {
+  setBaseUrl(apiUrl);
+}
 
 setAuthTokenGetter(async () => {
   const { data } = await supabase.auth.getSession();
@@ -21,6 +28,11 @@ import Dashboard from "@/pages/dashboard";
 import Customers from "@/pages/customers";
 import CustomerDetail from "@/pages/customer-detail";
 import Orders from "@/pages/orders";
+import Companies from "@/pages/companies";
+import Leads from "@/pages/leads";
+import Tasks from "@/pages/tasks";
+import Analytics from "@/pages/analytics";
+import Workflows from "@/pages/workflows";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +100,21 @@ function Router() {
       </Route>
       <Route path="/orders">
         <ProtectedRoute component={Orders} />
+      </Route>
+      <Route path="/companies">
+        <ProtectedRoute component={Companies} />
+      </Route>
+      <Route path="/leads">
+        <ProtectedRoute component={Leads} />
+      </Route>
+      <Route path="/tasks">
+        <ProtectedRoute component={Tasks} />
+      </Route>
+      <Route path="/analytics">
+        <ProtectedRoute component={Analytics} />
+      </Route>
+      <Route path="/workflows">
+        <ProtectedRoute component={Workflows} />
       </Route>
       <Route component={NotFound} />
     </Switch>
