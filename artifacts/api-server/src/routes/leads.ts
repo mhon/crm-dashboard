@@ -63,4 +63,15 @@ router.patch("/leads/:id", async (req, res) => {
   return res.json(data);
 });
 
+router.delete("/leads/:id", async (req, res) => {
+  const { id } = req.params;
+  const db = getClient(req);
+  const { error } = await db.from("leads").delete().eq("id", id);
+  if (error) {
+    req.log.error({ error }, "Failed to delete lead");
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(204).send();
+});
+
 export default router;

@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useListTasks,
   useCreateTask,
+  useDeleteTask,
   getListTasksQueryKey,
 } from "@workspace/api-client-react";
 
@@ -29,7 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Search, Plus, Calendar, CheckSquare, Loader2, ListTodo } from "lucide-react";
+import { Search, Plus, Calendar, Loader2, ListTodo, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,22 @@ export default function Tasks() {
   const tasks = Array.isArray(tasksData) ? tasksData : (tasksData as any)?.tasks ?? (tasksData as any)?.data ?? [];
 
   const createTask = useCreateTask();
+  const deleteTask = useDeleteTask();
+
+  const handleDeleteTask = (id: string) => {
+    deleteTask.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
+          toast({ title: "Task deleted" });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Error", description: "Failed to delete task." });
+        },
+      }
+    );
+  };
 
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
@@ -208,6 +225,15 @@ export default function Tasks() {
                 </div>
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center">
                   <span>Added {format(new Date(task.created_at), 'MMM d, yyyy')}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-destructive hover:text-destructive/80"
+                    onClick={() => handleDeleteTask(task.id)}
+                    disabled={deleteTask.isPending}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>

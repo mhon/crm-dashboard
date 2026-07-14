@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useListCompanies,
   useCreateCompany,
+  useDeleteCompany,
   getListCompaniesQueryKey,
 } from "@workspace/api-client-react";
 
@@ -36,7 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Plus, MoreHorizontal, Building2, Globe, Briefcase, Loader2 } from "lucide-react";
+import { Search, Plus, Building2, Globe, Briefcase, Loader2, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +58,22 @@ export default function Companies() {
   const companies = Array.isArray(companiesData) ? companiesData : (companiesData as any)?.companies ?? (companiesData as any)?.data ?? [];
 
   const createCompany = useCreateCompany();
+  const deleteCompany = useDeleteCompany();
+
+  const handleDeleteCompany = (id: string) => {
+    deleteCompany.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
+          toast({ title: "Company deleted" });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Error", description: "Failed to delete company." });
+        },
+      }
+    );
+  };
 
   const form = useForm<z.infer<typeof companySchema>>({
     resolver: zodResolver(companySchema),
@@ -223,8 +240,17 @@ export default function Companies() {
                     )}
                   </div>
                 </div>
-                <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t">
-                  Added {format(new Date(company.created_at), 'MMM d, yyyy')}
+                <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center">
+                  <span>Added {format(new Date(company.created_at), 'MMM d, yyyy')}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-destructive hover:text-destructive/80"
+                    onClick={() => handleDeleteCompany(company.id)}
+                    disabled={deleteCompany.isPending}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
                 </div>
               </CardContent>
             </Card>

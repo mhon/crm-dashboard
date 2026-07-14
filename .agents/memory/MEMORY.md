@@ -1,0 +1,3 @@
+- [Orval Zod v4 vs v3 fix](orval-zod-v3-fix.md) — Orval v8 generates zod.looseObject/uuid (v4 APIs); patch generated file in codegen script to replace with v3 equivalents.
+- [Workflow RLS bug](workflow-rls.md) — supabase-v3.sql originally had admin-only RLS; needs DROP + recreate FOR ALL policy for workflows table to allow inserts.
+- [lib/ai needs @types/node](ai-lib-node-types.md) — lib/ai uses process.env; requires @types/node devDep and "types": ["node"] in tsconfig to pass tsc --build.

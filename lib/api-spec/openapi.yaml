@@ -373,6 +373,42 @@ paths:
                 $ref: "#/components/schemas/Company"
         "404":
           description: Not found
+    patch:
+      operationId: updateCompany
+      tags: [companies]
+      summary: Update a company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Company"
+    delete:
+      operationId: deleteCompany
+      tags: [companies]
+      summary: Delete a company
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
 
   /leads:
     get:
@@ -449,6 +485,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lead"
+    delete:
+      operationId: deleteLead
+      tags: [leads]
+      summary: Delete a lead
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
 
   /tasks:
     get:
@@ -525,6 +574,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Task"
+    delete:
+      operationId: deleteTask
+      tags: [tasks]
+      summary: Delete a task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
 
   /ai/lead-score:
     post:
@@ -921,6 +983,8 @@ components:
           type: ["string", "null"]
         status:
           type: string
+        ai_score:
+          type: ["integer", "null"]
 
     Task:
       type: object

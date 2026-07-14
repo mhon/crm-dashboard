@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { getClient } from "../lib/supabase";
 import {
   CreateCompanyBody,
+  UpdateCompanyBody,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -43,6 +44,34 @@ router.get("/companies/:id", async (req, res) => {
     return res.status(404).json({ error: "Company not found" });
   }
   return res.json(data);
+});
+
+router.patch("/companies/:id", async (req, res) => {
+  const { id } = req.params;
+  const body = UpdateCompanyBody.parse(req.body);
+  const db = getClient(req);
+  const { data, error } = await db
+    .from("companies")
+    .update(body)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error || !data) {
+    req.log.error({ error }, "Failed to update company");
+    return res.status(500).json({ error: error?.message ?? "Not found" });
+  }
+  return res.json(data);
+});
+
+router.delete("/companies/:id", async (req, res) => {
+  const { id } = req.params;
+  const db = getClient(req);
+  const { error } = await db.from("companies").delete().eq("id", id);
+  if (error) {
+    req.log.error({ error }, "Failed to delete company");
+    return res.status(500).json({ error: error.message });
+  }
+  return res.status(204).send();
 });
 
 export default router;

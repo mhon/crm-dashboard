@@ -7,6 +7,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useListLeads,
   useCreateLead,
+  useUpdateLead,
+  useDeleteLead,
   getListLeadsQueryKey,
   useGenerateLeadScore,
 } from "@workspace/api-client-react";
@@ -31,7 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Search, Plus, UserCircle, Mail, Phone, Loader2, Target, BarChart } from "lucide-react";
+import { Search, Plus, Mail, Phone, Loader2, Target, BarChart, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -54,6 +56,8 @@ export default function Leads() {
   const leads = Array.isArray(leadsData) ? leadsData : (leadsData as any)?.leads ?? (leadsData as any)?.data ?? [];
 
   const createLead = useCreateLead();
+  const updateLead = useUpdateLead();
+  const deleteLead = useDeleteLead();
 
   const form = useForm<z.infer<typeof leadSchema>>({
     resolver: zodResolver(leadSchema),
@@ -73,20 +77,37 @@ export default function Leads() {
     generateLeadScore.mutate(
       { data: { leadData: lead } },
       {
-        onSuccess: (data) => {
-          setScoringLeadId(null);
-          // Wait, we need a way to persist this score, but for now we just show it.
-          // Ideally, we'd have a mutation to update the lead with the AI score, 
-          // or the API endpoint handles it. Let's just toast it for this demo.
-          toast({ 
-            title: "AI Score Generated", 
-            description: `Score: ${data.score}. ${data.explanation}` 
-          });
+        onSuccess: (data: any) => {
+          updateLead.mutate(
+            { id: lead.id, data: { name: lead.name, email: lead.email, ai_score: data.score } },
+            {
+              onSettled: () => {
+                setScoringLeadId(null);
+                queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
+              },
+            }
+          );
+          toast({ title: `AI Score: ${data.score}/100`, description: data.explanation });
         },
         onError: () => {
           setScoringLeadId(null);
           toast({ variant: "destructive", title: "Error", description: "Failed to score lead." });
         }
+      }
+    );
+  };
+
+  const handleDeleteLead = (id: string) => {
+    deleteLead.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
+          toast({ title: "Lead deleted" });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Error", description: "Failed to delete lead." });
+        },
       }
     );
   };
@@ -263,22 +284,33 @@ export default function Leads() {
                     )}
                   </div>
                 </div>
-                <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center">
+                <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center gap-2">
                   <span>Added {format(new Date(lead.created_at), 'MMM d, yyyy')}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 text-primary hover:text-primary/80"
-                    onClick={() => handleScoreLead(lead)}
-                    disabled={scoringLeadId === lead.id}
-                  >
-                    {scoringLeadId === lead.id ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Target className="mr-2 h-4 w-4" />
-                    )}
-                    AI Score
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 text-primary hover:text-primary/80"
+                      onClick={() => handleScoreLead(lead)}
+                      disabled={scoringLeadId === lead.id}
+                    >
+                      {scoringLeadId === lead.id ? (
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                      ) : (
+                        <Target className="mr-1 h-3 w-3" />
+                      )}
+                      AI Score
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-destructive hover:text-destructive/80"
+                      onClick={() => handleDeleteLead(lead.id)}
+                      disabled={deleteLead.isPending}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -11,5 +11,8 @@
     "@openrouter/ai-sdk-provider": "^3.0.0",
     "ai": "^7.0.18",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
   }
 }
