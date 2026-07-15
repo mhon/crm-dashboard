@@ -22,6 +22,7 @@ import type {
 import type {
   Company,
   CompanyInput,
+  CompanyUpdate,
   Customer,
   CustomerInput,
   CustomerUpdate,
@@ -47,6 +48,7 @@ import type {
   OrderUpdate,
   Task,
   TaskInput,
+  TaskUpdate,
   Workflow,
   WorkflowInput,
   WorkflowRun
@@ -1600,14 +1602,14 @@ export const getUpdateCompanyUrl = (id: string,) => {
  * @summary Update a company
  */
 export const updateCompany = async (id: string,
-    companyInput: CompanyInput, options?: RequestInit): Promise<Company> => {
+    companyUpdate: CompanyUpdate, options?: RequestInit): Promise<Company> => {
 
   return customFetch<Company>(getUpdateCompanyUrl(id),
   {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(companyInput)
+    body: JSON.stringify(companyUpdate)
   }
 );}
 
@@ -1616,8 +1618,8 @@ export const updateCompany = async (id: string,
 
 
 export const getUpdateCompanyMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyInput>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyUpdate>}, TContext> => {
 
 const mutationKey = ['updateCompany'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1629,7 +1631,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCompany>>, {id: string;data: BodyType<CompanyInput>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCompany>>, {id: string;data: BodyType<CompanyUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateCompany(id,data,requestOptions)
@@ -1643,18 +1645,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateCompanyMutationResult = NonNullable<Awaited<ReturnType<typeof updateCompany>>>
-    export type UpdateCompanyMutationBody = BodyType<CompanyInput>
+    export type UpdateCompanyMutationBody = BodyType<CompanyUpdate>
     export type UpdateCompanyMutationError = ErrorType<unknown>
 
     /**
  * @summary Update a company
  */
 export const useUpdateCompany = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCompany>>, TError,{id: string;data: BodyType<CompanyUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateCompany>>,
         TError,
-        {id: string;data: BodyType<CompanyInput>},
+        {id: string;data: BodyType<CompanyUpdate>},
         TContext
       > => {
       return useMutation(getUpdateCompanyMutationOptions(options));
@@ -2336,14 +2338,14 @@ export const getUpdateTaskUrl = (id: string,) => {
  * @summary Update a task
  */
 export const updateTask = async (id: string,
-    taskInput: TaskInput, options?: RequestInit): Promise<Task> => {
+    taskUpdate: TaskUpdate, options?: RequestInit): Promise<Task> => {
 
   return customFetch<Task>(getUpdateTaskUrl(id),
   {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(taskInput)
+    body: JSON.stringify(taskUpdate)
   }
 );}
 
@@ -2352,8 +2354,8 @@ export const updateTask = async (id: string,
 
 
 export const getUpdateTaskMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskInput>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskUpdate>}, TContext> => {
 
 const mutationKey = ['updateTask'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -2365,7 +2367,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTask>>, {id: string;data: BodyType<TaskInput>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTask>>, {id: string;data: BodyType<TaskUpdate>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateTask(id,data,requestOptions)
@@ -2379,18 +2381,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type UpdateTaskMutationResult = NonNullable<Awaited<ReturnType<typeof updateTask>>>
-    export type UpdateTaskMutationBody = BodyType<TaskInput>
+    export type UpdateTaskMutationBody = BodyType<TaskUpdate>
     export type UpdateTaskMutationError = ErrorType<unknown>
 
     /**
  * @summary Update a task
  */
 export const useUpdateTask = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTask>>, TError,{id: string;data: BodyType<TaskUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof updateTask>>,
         TError,
-        {id: string;data: BodyType<TaskInput>},
+        {id: string;data: BodyType<TaskUpdate>},
         TContext
       > => {
       return useMutation(getUpdateTaskMutationOptions(options));

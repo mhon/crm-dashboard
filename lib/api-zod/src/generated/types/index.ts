@@ -8,6 +8,7 @@
 
 export * from './company';
 export * from './companyInput';
+export * from './companyUpdate';
 export * from './customer';
 export * from './customerInput';
 export * from './customerUpdate';
@@ -38,6 +39,7 @@ export * from './orderUpdate';
 export * from './orderUpdateStatus';
 export * from './task';
 export * from './taskInput';
+export * from './taskUpdate';
 export * from './workflow';
 export * from './workflowActionsItem';
 export * from './workflowInput';

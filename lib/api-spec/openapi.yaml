@@ -388,7 +388,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CompanyInput"
+              $ref: "#/components/schemas/CompanyUpdate"
       responses:
         "200":
           description: Updated
@@ -566,7 +566,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskInput"
+              $ref: "#/components/schemas/TaskUpdate"
       responses:
         "200":
           description: Updated
@@ -986,6 +986,17 @@ components:
         industry:
           type: ["string", "null"]
 
+    CompanyUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        domain:
+          type: ["string", "null"]
+        industry:
+          type: ["string", "null"]
+
     Lead:
       type: object
       required: [id, name, email, status, created_at]
@@ -1052,6 +1063,25 @@ components:
     TaskInput:
       type: object
       required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: ["string", "null"]
+        due_date:
+          type: ["string", "null"]
+        status:
+          type: string
+        related_lead_id:
+          type: ["string", "null"]
+        related_customer_id:
+          type: ["string", "null"]
+        assigned_to:
+          type: ["string", "null"]
+
+    TaskUpdate:
+      type: object
       properties:
         title:
           type: string

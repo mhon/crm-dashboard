@@ -202,6 +202,15 @@ export interface CompanyInput {
   industry?: string | null;
 }
 
+export interface CompanyUpdate {
+  /** @minLength 1 */
+  name?: string;
+  /** @nullable */
+  domain?: string | null;
+  /** @nullable */
+  industry?: string | null;
+}
+
 export interface Lead {
   id: string;
   /** @nullable */
@@ -250,6 +259,22 @@ export interface Task {
 export interface TaskInput {
   /** @minLength 1 */
   title: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  due_date?: string | null;
+  status?: string;
+  /** @nullable */
+  related_lead_id?: string | null;
+  /** @nullable */
+  related_customer_id?: string | null;
+  /** @nullable */
+  assigned_to?: string | null;
+}
+
+export interface TaskUpdate {
+  /** @minLength 1 */
+  title?: string;
   /** @nullable */
   description?: string | null;
   /** @nullable */

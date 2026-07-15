@@ -348,7 +348,7 @@ export const UpdateCompanyParams = zod.object({
 
 
 export const UpdateCompanyBody = zod.object({
-  "name": zod.string().min(1),
+  "name": zod.string().min(1).optional(),
   "domain": zod.string().nullish(),
   "industry": zod.string().nullish()
 })
@@ -554,7 +554,7 @@ export const UpdateTaskParams = zod.object({
 
 
 export const UpdateTaskBody = zod.object({
-  "title": zod.string().min(1),
+  "title": zod.string().min(1).optional(),
   "description": zod.string().nullish(),
   "due_date": zod.string().nullish(),
   "status": zod.string().optional(),
