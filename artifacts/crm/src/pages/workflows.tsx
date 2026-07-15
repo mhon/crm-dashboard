@@ -5,10 +5,10 @@ import {
   useRunWorkflow,
   getListWorkflowsQueryKey,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError } from "@/lib/swal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
@@ -30,10 +30,10 @@ export default function Workflows() {
   const workflows = Array.isArray(workflowsData)
     ? workflowsData
     : (workflowsData as any)?.workflows ?? (workflowsData as any)?.data ?? [];
+
   const createWorkflow = useCreateWorkflow();
   const runWorkflow = useRunWorkflow();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [name, setName] = useState("");
@@ -43,7 +43,6 @@ export default function Workflows() {
 
   const handleCreate = () => {
     if (!name || !triggerEvent) return;
-
     createWorkflow.mutate(
       {
         data: {
@@ -61,11 +60,9 @@ export default function Workflows() {
           setIsCreateOpen(false);
           setName("");
           setTriggerEvent("");
-          toast({ title: "Workflow created", description: "Your automation has been set up." });
+          swalSuccess("Workflow Created!", "Your automation has been set up successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to create workflow." });
-        },
+        onError: () => swalError("Failed to Create", "Could not create the workflow."),
       }
     );
   };
@@ -78,11 +75,10 @@ export default function Workflows() {
         onSuccess: (data: any) => {
           setRunningId(null);
           setRunResult({ wfName: wf.name, logs: data.logs });
-          toast({ title: "Test run complete", description: `Workflow "${wf.name}" ran successfully.` });
         },
         onError: () => {
           setRunningId(null);
-          toast({ variant: "destructive", title: "Test run failed", description: "Could not run the workflow." });
+          swalError("Test Run Failed", `Could not run workflow "${wf.name}".`);
         },
       }
     );
@@ -132,11 +128,8 @@ export default function Workflows() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                onClick={handleCreate}
-                disabled={createWorkflow.isPending || !name || !triggerEvent}
-              >
-                {createWorkflow.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              <Button onClick={handleCreate} disabled={createWorkflow.isPending || !name || !triggerEvent}>
+                {createWorkflow.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Workflow
               </Button>
             </DialogFooter>
@@ -206,22 +199,20 @@ export default function Workflows() {
                       Triggers on: <strong className="font-medium">{wf.triggerEvent}</strong>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      disabled={runningId === wf.id}
-                      onClick={() => handleTestRun(wf)}
-                    >
-                      {runningId === wf.id ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Play className="h-3 w-3" />
-                      )}
-                      {runningId === wf.id ? "Running..." : "Test Run"}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    disabled={runningId === wf.id}
+                    onClick={() => handleTestRun(wf)}
+                  >
+                    {runningId === wf.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Play className="h-3 w-3" />
+                    )}
+                    {runningId === wf.id ? "Running..." : "Test Run"}
+                  </Button>
                 </div>
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t">
                   Created {wf.createdAt ? format(new Date(wf.createdAt), "MMM d, yyyy") : "Unknown"}

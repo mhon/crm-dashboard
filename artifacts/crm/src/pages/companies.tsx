@@ -10,6 +10,7 @@ import {
   useDeleteCompany,
   getListCompaniesQueryKey,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError, swalConfirmDelete } from "@/lib/swal";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +35,6 @@ import {
 import { Search, Plus, Building2, Globe, Briefcase, Loader2, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 
 const companySchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -48,7 +48,6 @@ export default function Companies() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: companiesData, isLoading } = useListCompanies();
   const companies = Array.isArray(companiesData)
@@ -68,21 +67,6 @@ export default function Companies() {
     resolver: zodResolver(companySchema),
     defaultValues: { name: "", domain: "", industry: "" },
   });
-
-  const handleDeleteCompany = (id: string) => {
-    deleteCompany.mutate(
-      { id },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
-          toast({ title: "Company deleted" });
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to delete company." });
-        },
-      }
-    );
-  };
 
   const handleOpenEdit = (company: any) => {
     setSelectedCompany(company);
@@ -110,11 +94,24 @@ export default function Companies() {
           queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
           setIsEditOpen(false);
           setSelectedCompany(null);
-          toast({ title: "Company updated", description: "Changes saved successfully." });
+          swalSuccess("Company Updated!", "Changes have been saved successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to update company." });
+        onError: () => swalError("Failed to Update", "Could not update this company."),
+      }
+    );
+  };
+
+  const handleDeleteCompany = async (company: any) => {
+    const result = await swalConfirmDelete(company.name);
+    if (!result.isConfirmed) return;
+    deleteCompany.mutate(
+      { id: company.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
+          swalSuccess("Deleted!", `${company.name} has been removed.`);
         },
+        onError: () => swalError("Failed to Delete", "Could not remove this company."),
       }
     );
   };
@@ -127,11 +124,9 @@ export default function Companies() {
           queryClient.invalidateQueries({ queryKey: getListCompaniesQueryKey() });
           setIsCreateOpen(false);
           form.reset();
-          toast({ title: "Company created", description: "The company has been added successfully." });
+          swalSuccess("Company Created!", "The company has been added successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to create company." });
-        },
+        onError: () => swalError("Failed to Create", "Could not create this company."),
       }
     );
   }
@@ -169,45 +164,15 @@ export default function Companies() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Acme Corp" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="domain"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Domain</FormLabel>
-                      <FormControl>
-                        <Input placeholder="acme.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="industry"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Industry</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Technology" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={form.control} name="name" render={({ field }) => (
+                  <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="Acme Corp" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="domain" render={({ field }) => (
+                  <FormItem><FormLabel>Domain</FormLabel><FormControl><Input placeholder="acme.com" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="industry" render={({ field }) => (
+                  <FormItem><FormLabel>Industry</FormLabel><FormControl><Input placeholder="Technology" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <DialogFooter>
                   <Button type="submit" disabled={createCompany.isPending}>
                     {createCompany.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -221,13 +186,7 @@ export default function Companies() {
       </div>
 
       {/* Edit Company Dialog */}
-      <Dialog
-        open={isEditOpen}
-        onOpenChange={(open) => {
-          setIsEditOpen(open);
-          if (!open) setSelectedCompany(null);
-        }}
-      >
+      <Dialog open={isEditOpen} onOpenChange={(open) => { setIsEditOpen(open); if (!open) setSelectedCompany(null); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Company</DialogTitle>
@@ -235,45 +194,15 @@ export default function Companies() {
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-4">
-              <FormField
-                control={editForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Acme Corp" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="domain"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Domain</FormLabel>
-                    <FormControl>
-                      <Input placeholder="acme.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="industry"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Industry</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Technology" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormField control={editForm.control} name="name" render={({ field }) => (
+                <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="Acme Corp" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="domain" render={({ field }) => (
+                <FormItem><FormLabel>Domain</FormLabel><FormControl><Input placeholder="acme.com" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="industry" render={({ field }) => (
+                <FormItem><FormLabel>Industry</FormLabel><FormControl><Input placeholder="Technology" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
               <DialogFooter>
                 <Button type="submit" disabled={updateCompany.isPending}>
                   {updateCompany.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -287,21 +216,19 @@ export default function Companies() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          Array(6)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="p-6 space-y-4">
-                    <Skeleton className="h-6 w-2/3" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-4/5" />
-                    </div>
+          Array(6).fill(0).map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-2/3" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
                   </div>
-                </CardContent>
-              </Card>
-            ))
+                </div>
+              </CardContent>
+            </Card>
+          ))
         ) : filteredCompanies?.length === 0 ? (
           <div className="col-span-full py-12 text-center text-muted-foreground">
             <Building2 className="mx-auto h-12 w-12 opacity-20 mb-4" />
@@ -316,7 +243,6 @@ export default function Companies() {
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-semibold text-lg truncate pr-4">{company.name}</h3>
                   </div>
-
                   <div className="space-y-2 text-sm text-muted-foreground">
                     {company.domain && (
                       <div className="flex items-center gap-2">
@@ -332,23 +258,20 @@ export default function Companies() {
                     )}
                   </div>
                 </div>
-
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center">
                   <span>Added {format(new Date(company.created_at), "MMM d, yyyy")}</span>
                   <div className="flex items-center gap-1">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="ghost" size="sm"
                       className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                       onClick={() => handleOpenEdit(company)}
                     >
                       <Pencil className="h-3 w-3" />
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="ghost" size="sm"
                       className="h-7 w-7 p-0 text-destructive hover:text-destructive/80"
-                      onClick={() => handleDeleteCompany(company.id)}
+                      onClick={() => handleDeleteCompany(company)}
                       disabled={deleteCompany.isPending}
                     >
                       <Trash2 className="h-3 w-3" />

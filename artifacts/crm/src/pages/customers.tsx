@@ -7,9 +7,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useListCustomers,
   useCreateCustomer,
+  useUpdateCustomer,
   useDeleteCustomer,
   getListCustomersQueryKey,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError, swalConfirmDelete } from "@/lib/swal";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,10 +39,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Plus, MoreHorizontal, User, Mail, Phone, Loader2, Trash } from "lucide-react";
+import { Search, Plus, MoreHorizontal, User, Mail, Phone, Loader2, Trash, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -51,25 +52,30 @@ const customerSchema = z.object({
 export default function Customers() {
   const [search, setSearch] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: customersData, isLoading } = useListCustomers(
     { search: search || undefined },
     { query: { queryKey: getListCustomersQueryKey({ search: search || undefined }) } }
   );
-  const customers = Array.isArray(customersData) ? customersData : (customersData as any)?.customers ?? (customersData as any)?.data ?? [];
+  const customers = Array.isArray(customersData)
+    ? customersData
+    : (customersData as any)?.customers ?? (customersData as any)?.data ?? [];
 
   const createCustomer = useCreateCustomer();
+  const updateCustomer = useUpdateCustomer();
   const deleteCustomer = useDeleteCustomer();
 
   const form = useForm<z.infer<typeof customerSchema>>({
     resolver: zodResolver(customerSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-    },
+    defaultValues: { name: "", email: "", phone: "" },
+  });
+
+  const editForm = useForm<z.infer<typeof customerSchema>>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: { name: "", email: "", phone: "" },
   });
 
   function onSubmit(values: z.infer<typeof customerSchema>) {
@@ -80,34 +86,50 @@ export default function Customers() {
           queryClient.invalidateQueries({ queryKey: getListCustomersQueryKey() });
           setIsCreateOpen(false);
           form.reset();
-          toast({
-            title: "Customer created",
-            description: "The customer has been added successfully.",
-          });
+          swalSuccess("Customer Created!", "The customer has been added successfully.");
         },
-        onError: () => {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to create customer.",
-          });
-        },
+        onError: () => swalError("Failed to Create", "Could not create the customer."),
       }
     );
   }
 
-  const handleDelete = (id: string) => {
-    if (!confirm("Are you sure you want to delete this customer?")) return;
-    deleteCustomer.mutate(
-      { id },
+  const handleOpenEdit = (customer: any) => {
+    setSelectedCustomer(customer);
+    editForm.reset({
+      name: customer.name ?? "",
+      email: customer.email ?? "",
+      phone: customer.phone ?? "",
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleEditSubmit = (values: z.infer<typeof customerSchema>) => {
+    if (!selectedCustomer) return;
+    updateCustomer.mutate(
+      { id: selectedCustomer.id, data: values },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListCustomersQueryKey() });
-          toast({
-            title: "Customer deleted",
-            description: "The customer has been removed.",
-          });
+          setIsEditOpen(false);
+          setSelectedCustomer(null);
+          swalSuccess("Customer Updated!", "Changes have been saved successfully.");
         },
+        onError: () => swalError("Failed to Update", "Could not update the customer."),
+      }
+    );
+  };
+
+  const handleDelete = async (customer: any) => {
+    const result = await swalConfirmDelete(customer.name);
+    if (!result.isConfirmed) return;
+    deleteCustomer.mutate(
+      { id: customer.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCustomersQueryKey() });
+          swalSuccess("Deleted!", `${customer.name} has been removed.`);
+        },
+        onError: () => swalError("Failed to Delete", "Could not remove this customer."),
       }
     );
   };
@@ -124,7 +146,8 @@ export default function Customers() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
+
+        {/* Create Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto">
@@ -135,51 +158,19 @@ export default function Customers() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Customer</DialogTitle>
-              <DialogDescription>
-                Create a new customer profile. Click save when you're done.
-              </DialogDescription>
+              <DialogDescription>Create a new customer profile. Click save when you're done.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Acme Corp" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="contact@acme.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="(555) 123-4567" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={form.control} name="name" render={({ field }) => (
+                  <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="Juan dela Cruz" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="email" render={({ field }) => (
+                  <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="juan@example.com" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="phone" render={({ field }) => (
+                  <FormItem><FormLabel>Phone (Optional)</FormLabel><FormControl><Input placeholder="+63 917 123 4567" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <DialogFooter>
                   <Button type="submit" disabled={createCustomer.isPending}>
                     {createCustomer.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -191,6 +182,35 @@ export default function Customers() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={(open) => { setIsEditOpen(open); if (!open) setSelectedCustomer(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogDescription>Update this customer's profile.</DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-4">
+              <FormField control={editForm.control} name="name" render={({ field }) => (
+                <FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="email" render={({ field }) => (
+                <FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="phone" render={({ field }) => (
+                <FormItem><FormLabel>Phone (Optional)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <DialogFooter>
+                <Button type="submit" disabled={updateCustomer.isPending}>
+                  {updateCustomer.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
@@ -237,9 +257,13 @@ export default function Customers() {
                             View Details
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenEdit(customer)}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           className="text-destructive focus:text-destructive cursor-pointer"
-                          onClick={() => handleDelete(customer.id)}
+                          onClick={() => handleDelete(customer)}
                         >
                           <Trash className="mr-2 h-4 w-4" />
                           Delete
@@ -247,7 +271,7 @@ export default function Customers() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 flex-shrink-0" />
@@ -262,7 +286,7 @@ export default function Customers() {
                   </div>
                 </div>
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t">
-                  Added {format(new Date(customer.created_at), 'MMM d, yyyy')}
+                  Added {format(new Date(customer.created_at), "MMM d, yyyy")}
                 </div>
               </CardContent>
             </Card>

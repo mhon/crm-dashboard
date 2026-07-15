@@ -10,6 +10,7 @@ import {
   useDeleteTask,
   getListTasksQueryKey,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError, swalConfirmDelete } from "@/lib/swal";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,6 @@ import {
 import { Search, Plus, Calendar, Loader2, ListTodo, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const taskSchema = z.object({
@@ -57,7 +57,6 @@ export default function Tasks() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: tasksData, isLoading } = useListTasks();
   const tasks = Array.isArray(tasksData)
@@ -77,21 +76,6 @@ export default function Tasks() {
     resolver: zodResolver(taskSchema),
     defaultValues: { title: "", description: "", status: "pending", due_date: "" },
   });
-
-  const handleDeleteTask = (id: string) => {
-    deleteTask.mutate(
-      { id },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
-          toast({ title: "Task deleted" });
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to delete task." });
-        },
-      }
-    );
-  };
 
   const handleOpenEdit = (task: any) => {
     setSelectedTask(task);
@@ -121,11 +105,24 @@ export default function Tasks() {
           queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
           setIsEditOpen(false);
           setSelectedTask(null);
-          toast({ title: "Task updated", description: "Changes saved successfully." });
+          swalSuccess("Task Updated!", "Changes have been saved successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to update task." });
+        onError: () => swalError("Failed to Update", "Could not update this task."),
+      }
+    );
+  };
+
+  const handleDeleteTask = async (task: any) => {
+    const result = await swalConfirmDelete(task.title);
+    if (!result.isConfirmed) return;
+    deleteTask.mutate(
+      { id: task.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
+          swalSuccess("Deleted!", `"${task.title}" has been removed.`);
         },
+        onError: () => swalError("Failed to Delete", "Could not remove this task."),
       }
     );
   };
@@ -138,11 +135,9 @@ export default function Tasks() {
           queryClient.invalidateQueries({ queryKey: getListTasksQueryKey() });
           setIsCreateOpen(false);
           form.reset();
-          toast({ title: "Task created", description: "The task has been added successfully." });
+          swalSuccess("Task Created!", "The task has been added successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to create task." });
-        },
+        onError: () => swalError("Failed to Create", "Could not create this task."),
       }
     );
   }
@@ -162,6 +157,23 @@ export default function Tasks() {
         return <Badge variant="outline" className="border-primary text-primary">{status}</Badge>;
     }
   };
+
+  const statusFields = (control: any) => (
+    <FormField control={control} name="status" render={({ field }) => (
+      <FormItem>
+        <FormLabel>Status</FormLabel>
+        <Select onValueChange={field.onChange} value={field.value}>
+          <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+        <FormMessage />
+      </FormItem>
+    )} />
+  );
 
   return (
     <div className="space-y-6">
@@ -191,67 +203,16 @@ export default function Tasks() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Call John" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Discuss new features" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="in_progress">In Progress</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="due_date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date (Optional)</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={form.control} name="title" render={({ field }) => (
+                  <FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="Call John" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="description" render={({ field }) => (
+                  <FormItem><FormLabel>Description (Optional)</FormLabel><FormControl><Input placeholder="Discuss new features" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                {statusFields(form.control)}
+                <FormField control={form.control} name="due_date" render={({ field }) => (
+                  <FormItem><FormLabel>Due Date (Optional)</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
                 <DialogFooter>
                   <Button type="submit" disabled={createTask.isPending}>
                     {createTask.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -265,13 +226,7 @@ export default function Tasks() {
       </div>
 
       {/* Edit Task Dialog */}
-      <Dialog
-        open={isEditOpen}
-        onOpenChange={(open) => {
-          setIsEditOpen(open);
-          if (!open) setSelectedTask(null);
-        }}
-      >
+      <Dialog open={isEditOpen} onOpenChange={(open) => { setIsEditOpen(open); if (!open) setSelectedTask(null); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Task</DialogTitle>
@@ -279,67 +234,16 @@ export default function Tasks() {
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-4">
-              <FormField
-                control={editForm.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Call John" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Discuss new features" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="due_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date (Optional)</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormField control={editForm.control} name="title" render={({ field }) => (
+                <FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="Call John" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="description" render={({ field }) => (
+                <FormItem><FormLabel>Description (Optional)</FormLabel><FormControl><Input placeholder="Discuss new features" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              {statusFields(editForm.control)}
+              <FormField control={editForm.control} name="due_date" render={({ field }) => (
+                <FormItem><FormLabel>Due Date (Optional)</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
               <DialogFooter>
                 <Button type="submit" disabled={updateTask.isPending}>
                   {updateTask.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -353,21 +257,19 @@ export default function Tasks() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          Array(6)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="p-6 space-y-4">
-                    <Skeleton className="h-6 w-2/3" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-4/5" />
-                    </div>
+          Array(6).fill(0).map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-2/3" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
                   </div>
-                </CardContent>
-              </Card>
-            ))
+                </div>
+              </CardContent>
+            </Card>
+          ))
         ) : filteredTasks?.length === 0 ? (
           <div className="col-span-full py-12 text-center text-muted-foreground">
             <ListTodo className="mx-auto h-12 w-12 opacity-20 mb-4" />
@@ -383,37 +285,30 @@ export default function Tasks() {
                     <h3 className="font-semibold text-lg truncate pr-4">{task.title}</h3>
                     {getStatusBadge(task.status)}
                   </div>
-
                   {task.description && (
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{task.description}</p>
                   )}
-
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    {task.due_date && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 flex-shrink-0" />
-                        <span>Due: {format(new Date(task.due_date), "MMM d, yyyy")}</span>
-                      </div>
-                    )}
-                  </div>
+                  {task.due_date && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
+                      <span>Due: {format(new Date(task.due_date), "MMM d, yyyy")}</span>
+                    </div>
+                  )}
                 </div>
-
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center">
                   <span>Added {format(new Date(task.created_at), "MMM d, yyyy")}</span>
                   <div className="flex items-center gap-1">
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="ghost" size="sm"
                       className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                       onClick={() => handleOpenEdit(task)}
                     >
                       <Pencil className="h-3 w-3" />
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="ghost" size="sm"
                       className="h-7 w-7 p-0 text-destructive hover:text-destructive/80"
-                      onClick={() => handleDeleteTask(task.id)}
+                      onClick={() => handleDeleteTask(task)}
                       disabled={deleteTask.isPending}
                     >
                       <Trash2 className="h-3 w-3" />

@@ -15,6 +15,7 @@ import {
   getListOrdersQueryKey,
   getListNotesQueryKey,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError, swalConfirmDelete } from "@/lib/swal";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +32,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
 import {
   Mail,
   Phone,
@@ -67,7 +67,6 @@ function getStatusBadge(status: string) {
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">Paid</Badge>;
     case "shipped":
       return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">Shipped</Badge>;
-    case "pending":
     default:
       return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800">Pending</Badge>;
   }
@@ -76,19 +75,16 @@ function getStatusBadge(status: string) {
 export default function CustomerDetail() {
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
 
   const { data: customer, isLoading: loadingCustomer } = useGetCustomer(
     id,
     { query: { queryKey: getGetCustomerQueryKey(id), enabled: !!id } }
   );
-
   const { data: orders, isLoading: loadingOrders } = useListOrders(
     { customer_id: id },
     { query: { queryKey: getListOrdersQueryKey({ customer_id: id }), enabled: !!id } }
   );
-
   const { data: notes, isLoading: loadingNotes } = useListNotes(
     { customer_id: id },
     { query: { queryKey: getListNotesQueryKey({ customer_id: id }), enabled: !!id } }
@@ -113,22 +109,10 @@ export default function CustomerDetail() {
   const timeline = useMemo<TimelineItem[]>(() => {
     const items: TimelineItem[] = [];
     for (const o of orders ?? []) {
-      items.push({
-        type: "order",
-        id: o.id,
-        date: new Date(o.created_at),
-        product_name: o.product_name,
-        amount: o.amount,
-        status: o.status,
-      });
+      items.push({ type: "order", id: o.id, date: new Date(o.created_at), product_name: o.product_name, amount: o.amount, status: o.status });
     }
     for (const n of notes ?? []) {
-      items.push({
-        type: "note",
-        id: n.id,
-        date: new Date(n.created_at),
-        text: n.text,
-      });
+      items.push({ type: "note", id: n.id, date: new Date(n.created_at), text: n.text });
     }
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
   }, [orders, notes]);
@@ -140,11 +124,9 @@ export default function CustomerDetail() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCustomerQueryKey(id) });
           setIsEditing(false);
-          toast({ title: "Customer updated" });
+          swalSuccess("Customer Updated!", "Profile has been saved successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to update customer" });
-        },
+        onError: () => swalError("Failed to Update", "Could not update this customer."),
       }
     );
   }
@@ -156,20 +138,24 @@ export default function CustomerDetail() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListNotesQueryKey({ customer_id: id }) });
           noteForm.reset();
-          toast({ title: "Note added" });
+          swalSuccess("Note Added!", "Your note has been saved.");
         },
+        onError: () => swalError("Failed to Add Note", "Could not save the note."),
       }
     );
   }
 
-  const handleDeleteNote = (noteId: string) => {
+  const handleDeleteNote = async (noteId: string, preview: string) => {
+    const result = await swalConfirmDelete("this note");
+    if (!result.isConfirmed) return;
     deleteNote.mutate(
       { id: noteId },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListNotesQueryKey({ customer_id: id }) });
-          toast({ title: "Note deleted" });
+          swalSuccess("Note Deleted!", "The note has been removed.");
         },
+        onError: () => swalError("Failed to Delete", "Could not remove this note."),
       }
     );
   };
@@ -198,39 +184,15 @@ export default function CustomerDetail() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onUpdateCustomer)} className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl><Input {...field} value={field.value || ""} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <FormField control={form.control} name="name" render={({ field }) => (
+                    <FormItem><FormLabel>Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="email" render={({ field }) => (
+                    <FormItem><FormLabel>Email</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  )} />
+                  <FormField control={form.control} name="phone" render={({ field }) => (
+                    <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} value={field.value || ""} /></FormControl><FormMessage /></FormItem>
+                  )} />
                 </div>
                 <div className="flex gap-2 justify-end mt-4">
                   <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
@@ -268,9 +230,8 @@ export default function CustomerDetail() {
         </CardContent>
       </Card>
 
-      {/* Orders + Notes side by side */}
+      {/* Orders + Notes */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Orders */}
         <Card className="h-fit">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -280,10 +241,7 @@ export default function CustomerDetail() {
           </CardHeader>
           <CardContent>
             {loadingOrders ? (
-              <div className="space-y-4">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-              </div>
+              <div className="space-y-4"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
             ) : orders?.length === 0 ? (
               <p className="text-muted-foreground text-sm text-center py-4">No orders yet.</p>
             ) : (
@@ -305,7 +263,6 @@ export default function CustomerDetail() {
           </CardContent>
         </Card>
 
-        {/* Notes */}
         <Card className="h-fit">
           <CardHeader>
             <div className="flex items-center gap-2">
@@ -316,22 +273,14 @@ export default function CustomerDetail() {
           <CardContent className="space-y-6">
             <Form {...noteForm}>
               <form onSubmit={noteForm.handleSubmit(onAddNote)} className="space-y-3">
-                <FormField
-                  control={noteForm.control}
-                  name="text"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Add a note about this customer..."
-                          className="resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={noteForm.control} name="text" render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea placeholder="Add a note about this customer..." className="resize-none" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <Button type="submit" size="sm" className="w-full" disabled={createNote.isPending}>
                   {createNote.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                   Add Note
@@ -342,10 +291,7 @@ export default function CustomerDetail() {
             <Separator />
 
             {loadingNotes ? (
-              <div className="space-y-4">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-20 w-full" />
-              </div>
+              <div className="space-y-4"><Skeleton className="h-20 w-full" /><Skeleton className="h-20 w-full" /></div>
             ) : notes?.length === 0 ? (
               <p className="text-muted-foreground text-sm text-center py-4">No notes added.</p>
             ) : (
@@ -356,7 +302,7 @@ export default function CustomerDetail() {
                     <div className="flex justify-between items-center text-xs text-muted-foreground">
                       <span>{format(new Date(note.created_at), "MMM d, yyyy h:mm a")}</span>
                       <button
-                        onClick={() => handleDeleteNote(note.id)}
+                        onClick={() => handleDeleteNote(note.id, note.text)}
                         disabled={deleteNote.isPending}
                         className="text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                         aria-label="Delete note"
@@ -401,13 +347,10 @@ export default function CustomerDetail() {
             </div>
           ) : (
             <div className="relative">
-              {/* Vertical line */}
               <div className="absolute left-4 top-5 bottom-5 w-px bg-border" />
-
               <div className="space-y-6">
-                {timeline.map((item, index) => (
+                {timeline.map((item) => (
                   <div key={`${item.type}-${item.id}`} className="flex gap-4 relative">
-                    {/* Icon bubble */}
                     {item.type === "order" ? (
                       <div className="relative z-10 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/40 border-2 border-blue-200 dark:border-blue-800">
                         <ShoppingBag className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -417,8 +360,6 @@ export default function CustomerDetail() {
                         <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                       </div>
                     )}
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0 pb-4">
                       <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
                         <span className={`text-xs font-semibold uppercase tracking-wide ${item.type === "order" ? "text-blue-600 dark:text-blue-400" : "text-amber-600 dark:text-amber-400"}`}>
@@ -428,7 +369,6 @@ export default function CustomerDetail() {
                           {format(item.date, "MMM d, yyyy · h:mm a")}
                         </span>
                       </div>
-
                       {item.type === "order" ? (
                         <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900 rounded-lg p-3">
                           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -444,7 +384,7 @@ export default function CustomerDetail() {
                           <div className="flex justify-between items-start gap-2">
                             <p className="text-sm whitespace-pre-wrap flex-1">{item.text}</p>
                             <button
-                              onClick={() => handleDeleteNote(item.id)}
+                              onClick={() => handleDeleteNote(item.id, item.text)}
                               disabled={deleteNote.isPending}
                               className="text-destructive opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5"
                               aria-label="Delete note"

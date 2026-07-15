@@ -11,6 +11,7 @@ import {
   getListLeadsQueryKey,
   useGenerateLeadScore,
 } from "@workspace/api-client-react";
+import { swalSuccess, swalError, swalConfirmDelete, swalInfo } from "@/lib/swal";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +43,6 @@ import {
 import { Search, Plus, Mail, Phone, Loader2, Target, BarChart, Trash2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const leadSchema = z.object({
@@ -57,15 +57,18 @@ export default function Leads() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [scoringLeadId, setScoringLeadId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const { data: leadsData, isLoading } = useListLeads();
-  const leads = Array.isArray(leadsData) ? leadsData : (leadsData as any)?.leads ?? (leadsData as any)?.data ?? [];
+  const leads = Array.isArray(leadsData)
+    ? leadsData
+    : (leadsData as any)?.leads ?? (leadsData as any)?.data ?? [];
 
   const createLead = useCreateLead();
   const updateLead = useUpdateLead();
   const deleteLead = useDeleteLead();
+  const generateLeadScore = useGenerateLeadScore();
 
   const form = useForm<z.infer<typeof leadSchema>>({
     resolver: zodResolver(leadSchema),
@@ -76,9 +79,6 @@ export default function Leads() {
     resolver: zodResolver(leadSchema),
     defaultValues: { name: "", email: "", phone: "", status: "new" },
   });
-
-  const generateLeadScore = useGenerateLeadScore();
-  const [scoringLeadId, setScoringLeadId] = useState<string | null>(null);
 
   const handleScoreLead = (lead: any) => {
     setScoringLeadId(lead.id);
@@ -95,27 +95,34 @@ export default function Leads() {
               },
             }
           );
-          toast({ title: `AI Score: ${data.score}/100`, description: data.explanation });
+          const scoreColor = data.score >= 70 ? "#22c55e" : data.score >= 40 ? "#f59e0b" : "#ef4444";
+          swalInfo(
+            `AI Score: ${data.score}/100`,
+            `<div style="text-align:center">
+              <div style="font-size:3rem;font-weight:bold;color:${scoreColor}">${data.score}</div>
+              <div style="font-size:0.85rem;color:#6b7280;margin-top:8px">${data.explanation ?? ""}</div>
+            </div>`
+          );
         },
         onError: () => {
           setScoringLeadId(null);
-          toast({ variant: "destructive", title: "Error", description: "Failed to score lead." });
+          swalError("Scoring Failed", "Could not generate an AI score for this lead.");
         },
       }
     );
   };
 
-  const handleDeleteLead = (id: string) => {
+  const handleDeleteLead = async (lead: any) => {
+    const result = await swalConfirmDelete(lead.name);
+    if (!result.isConfirmed) return;
     deleteLead.mutate(
-      { id },
+      { id: lead.id },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
-          toast({ title: "Lead deleted" });
+          swalSuccess("Deleted!", `${lead.name} has been removed.`);
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to delete lead." });
-        },
+        onError: () => swalError("Failed to Delete", "Could not remove this lead."),
       }
     );
   };
@@ -149,11 +156,9 @@ export default function Leads() {
           queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
           setIsEditOpen(false);
           setSelectedLead(null);
-          toast({ title: "Lead updated", description: "Changes saved successfully." });
+          swalSuccess("Lead Updated!", "Changes have been saved successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to update lead." });
-        },
+        onError: () => swalError("Failed to Update", "Could not update this lead."),
       }
     );
   };
@@ -166,11 +171,9 @@ export default function Leads() {
           queryClient.invalidateQueries({ queryKey: getListLeadsQueryKey() });
           setIsCreateOpen(false);
           form.reset();
-          toast({ title: "Lead created", description: "The lead has been added successfully." });
+          swalSuccess("Lead Added!", "The lead has been added successfully.");
         },
-        onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to create lead." });
-        },
+        onError: () => swalError("Failed to Create", "Could not add this lead."),
       }
     );
   }
@@ -205,7 +208,6 @@ export default function Leads() {
           />
         </div>
 
-        {/* Create Lead Dialog */}
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto">
@@ -220,68 +222,30 @@ export default function Leads() {
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="john@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="(555) 123-4567" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="new">New</SelectItem>
-                          <SelectItem value="contacted">Contacted</SelectItem>
-                          <SelectItem value="qualified">Qualified</SelectItem>
-                          <SelectItem value="lost">Lost</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormField control={form.control} name="name" render={({ field }) => (
+                  <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="email" render={({ field }) => (
+                  <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="john@example.com" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="phone" render={({ field }) => (
+                  <FormItem><FormLabel>Phone (Optional)</FormLabel><FormControl><Input placeholder="+63 917 123 4567" {...field} /></FormControl><FormMessage /></FormItem>
+                )} />
+                <FormField control={form.control} name="status" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
+                      <SelectContent>
+                        <SelectItem value="new">New</SelectItem>
+                        <SelectItem value="contacted">Contacted</SelectItem>
+                        <SelectItem value="qualified">Qualified</SelectItem>
+                        <SelectItem value="lost">Lost</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
                 <DialogFooter>
                   <Button type="submit" disabled={createLead.isPending}>
                     {createLead.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -303,68 +267,30 @@ export default function Leads() {
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(handleEditSubmit)} className="space-y-4">
-              <FormField
-                control={editForm.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="john@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="(555) 123-4567" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={editForm.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="contacted">Contacted</SelectItem>
-                        <SelectItem value="qualified">Qualified</SelectItem>
-                        <SelectItem value="lost">Lost</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <FormField control={editForm.control} name="name" render={({ field }) => (
+                <FormItem><FormLabel>Name</FormLabel><FormControl><Input placeholder="John Doe" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="email" render={({ field }) => (
+                <FormItem><FormLabel>Email</FormLabel><FormControl><Input placeholder="john@example.com" {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="phone" render={({ field }) => (
+                <FormItem><FormLabel>Phone (Optional)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+              )} />
+              <FormField control={editForm.control} name="status" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="contacted">Contacted</SelectItem>
+                      <SelectItem value="qualified">Qualified</SelectItem>
+                      <SelectItem value="lost">Lost</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
               <DialogFooter>
                 <Button type="submit" disabled={updateLead.isPending}>
                   {updateLead.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -432,12 +358,7 @@ export default function Leads() {
                 <div className="bg-muted/50 px-6 py-3 text-xs text-muted-foreground border-t flex justify-between items-center gap-2">
                   <span>Added {format(new Date(lead.created_at), "MMM d, yyyy")}</span>
                   <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 text-muted-foreground hover:text-foreground"
-                      onClick={() => handleOpenEdit(lead)}
-                    >
+                    <Button variant="ghost" size="sm" className="h-8 text-muted-foreground hover:text-foreground" onClick={() => handleOpenEdit(lead)}>
                       <Pencil className="h-3 w-3" />
                     </Button>
                     <Button
@@ -458,7 +379,7 @@ export default function Leads() {
                       variant="ghost"
                       size="sm"
                       className="h-8 text-destructive hover:text-destructive/80"
-                      onClick={() => handleDeleteLead(lead.id)}
+                      onClick={() => handleDeleteLead(lead)}
                       disabled={deleteLead.isPending}
                     >
                       <Trash2 className="h-3 w-3" />
