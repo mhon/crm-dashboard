@@ -361,11 +361,11 @@ export default function LandingPage() {
                 <ArrowRight size={16} />
               </button>
             </Link>
-            <a href="#features">
+            <Link href="/demo">
               <button className="outline-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent" }}>
                 Watch Demo
               </button>
-            </a>
+            </Link>
           </div>
         </FadeIn>
 

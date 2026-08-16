@@ -33,6 +33,7 @@ import Leads from "@/pages/leads";
 import Tasks from "@/pages/tasks";
 import Analytics from "@/pages/analytics";
 import Workflows from "@/pages/workflows";
+import Demo from "@/pages/demo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,6 +89,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      <Route path="/demo" component={Demo} />
       <Route path="/login" component={LoginRoute} />
       <Route path="/dashboard">
         <ProtectedRoute component={Dashboard} />
