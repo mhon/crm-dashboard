@@ -222,6 +222,49 @@ export default function LandingPage() {
           background-size: 200% 200%;
           animation: gradientShift 6s ease infinite;
         }
+        @keyframes mobileMenuIn {
+          from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .mobile-menu-panel {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 16px;
+          width: min(224px, calc(100vw - 32px));
+          padding: 8px;
+          background: rgba(10, 13, 30, 0.98);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 14px;
+          box-shadow: 0 18px 48px rgba(0,0,0,0.38), 0 0 0 1px rgba(124,58,237,0.08);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          animation: mobileMenuIn 0.18s ease-out;
+        }
+        .mobile-menu-link {
+          display: flex;
+          align-items: center;
+          min-height: 40px;
+          padding: 0 12px;
+          border-radius: 9px;
+          color: #cbd5e1;
+          font-size: 14px;
+          font-weight: 500;
+          text-decoration: none;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-link:hover,
+        .mobile-menu-link:focus-visible {
+          background: rgba(124,58,237,0.14);
+          color: white;
+          outline: none;
+        }
+        .mobile-menu-cta {
+          width: 100%;
+          margin-top: 6px;
+          padding: 10px 12px;
+          border-radius: 9px;
+          font-size: 14px;
+        }
         @media (max-width: 768px) {
           .mobile-menu-btn { display: block !important; }
           .mock-bar { display: none; }
@@ -275,12 +318,12 @@ export default function LandingPage() {
         </div>
 
         {mobileOpen && (
-          <div style={{ background: "rgba(5,8,20,0.97)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px", maxHeight: "calc(100vh - 68px)", overflowY: "auto" }}>
+          <div id="mobile-navigation" className="mobile-menu-panel" aria-label="Mobile navigation">
             {["Features", "Pricing", "Contact"].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)} style={{ display: "block", padding: "12px 0", color: "#94a3b8", fontSize: "16px", fontWeight: 500, textDecoration: "none" }}>{item}</a>
+              <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)} className="mobile-menu-link">{item}</a>
             ))}
             <Link href="/login">
-              <button className="cta-btn" style={{ width: "100%", marginTop: "16px", padding: "12px", borderRadius: "8px", fontSize: "15px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
+              <button className="cta-btn mobile-menu-cta" style={{ fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
                 <span>Start Free</span>
               </button>
             </Link>
