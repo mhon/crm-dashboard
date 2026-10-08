@@ -13,23 +13,52 @@ Includes a **marketing landing page, demo flow, and conversion-focused UI**.
 ## 🌐 Live Demo Flow
 
 - 🏠 Landing Page → explains product value
-- ▶️ Watch Demo → short video (30–40 sec) showing CRM usage
+- ▶️ Watch Demo → five short MP4 clips (about 40 seconds total)
 - 🔐 Login / Register → Supabase authentication
 - 📊 Dashboard → CRM system (customers, orders, revenue)
+
+## 🖼️ Website Screenshots
+
+These screenshots show the current website and core CRM experience.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Landing Page — Features</strong><br />
+      <img src="attached_assets/image_1791464968210.png" alt="CRM landing page features section" width="100%" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Watch Demo — Product Videos</strong><br />
+      <img src="attached_assets/image_1791465033169.png" alt="CRM product demo page with video player and clip selector" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Start Free — Sign In / Register</strong><br />
+      <img src="attached_assets/image_1791465063249.png" alt="CRM sign-in and registration screen" width="100%" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>CRM Dashboard</strong><br />
+      <img src="attached_assets/image_1791465111888.png" alt="CRM dashboard showing revenue, orders, customers, and recent activity" width="100%" />
+    </td>
+  </tr>
+</table>
+
+> The Analytics page is available in the CRM navigation, but an Analytics-page screenshot was not included with these uploads.
 
 ## 🚀 Features
 
 ### 🧲 Landing Page (Marketing Layer)
 - Hero Section:
   - "Track Customers, Orders, and Profits in One Dashboard"
-  - CTA buttons: **Start Free / View Demo**
+  - CTA buttons: **Start Free / Watch Demo**
 - Modern responsive UI (mobile-first)
 - Sections:
   - Features overview
   - Pricing plans
   - About / Company mission
   - Footer (contact + links)
-- Demo video integration (Canva / MP4 / YouTube embed)
+- Five sequential MP4 demo clips (about 40 seconds total)
 
 ### 🔐 Authentication
 - Email/password login and registration via **Supabase Auth**
