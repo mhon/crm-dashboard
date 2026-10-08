@@ -44,7 +44,40 @@ These screenshots show the current website and core CRM experience.
   </tr>
 </table>
 
-> The Analytics page is available in the CRM navigation, but an Analytics-page screenshot was not included with these uploads.
+### CRM Modules
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Analytics</strong><br />
+      <img src="attached_assets/image_1791465307249.png" alt="CRM Analytics dashboard with revenue, pipeline, and win-rate metrics" width="100%" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Companies</strong><br />
+      <img src="attached_assets/image_1791465332329.png" alt="CRM Companies page with company records and search" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Leads</strong><br />
+      <img src="attached_assets/image_1791465350018.png" alt="CRM Leads page with lead records and statuses" width="100%" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Customers</strong><br />
+      <img src="attached_assets/image_1791465366366.png" alt="CRM Customers page with customer records and contact details" width="100%" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <strong>Tasks</strong><br />
+      <img src="attached_assets/image_1791465383553.png" alt="CRM Tasks page with task status and due date" width="100%" />
+    </td>
+    <td width="50%" valign="top">
+      <strong>Workflows</strong><br />
+      <img src="attached_assets/image_1791465404867.png" alt="CRM Workflows page with active automations and test-run actions" width="100%" />
+    </td>
+  </tr>
+</table>
 
 ## 🚀 Features
 
