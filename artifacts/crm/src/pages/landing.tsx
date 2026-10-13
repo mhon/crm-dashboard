@@ -5,6 +5,8 @@ import {
   Users, Package, TrendingUp, Bell, LayoutDashboard, Smartphone,
   CheckCircle2, XCircle, ArrowRight, Menu, X, Star, ChevronRight,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "next-themes";
 
 function useCountUp(target: number, duration = 2000, start = false) {
   const [count, setCount] = useState(0);
@@ -127,6 +129,8 @@ const pricingPlans = [
 ];
 
 export default function LandingPage() {
+  const { resolvedTheme } = useTheme();
+  const lightTheme = resolvedTheme !== "dark";
   const { session, loading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -140,10 +144,26 @@ export default function LandingPage() {
   if (!loading && session) return <Redirect to="/dashboard" />;
 
   return (
-    <div style={{ background: "#050814", color: "#e2e8f0", fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh", overflow: "hidden" }}>
+    <div className={`landing-shell ${lightTheme ? "theme-light" : "theme-dark"}`} style={{ background: lightTheme ? "#f4f2fa" : "#10111d", color: lightTheme ? "#29283b" : "#e2e8f0", fontFamily: "'DM Sans', system-ui, sans-serif", minHeight: "100dvh", overflow: "hidden" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         html { scroll-behavior: smooth; }
+        .landing-shell.theme-light h1,.landing-shell.theme-light h2,.landing-shell.theme-light h3,.landing-shell.theme-light .landing-strong { color:#29283b !important; }
+        .landing-shell.theme-light p,.landing-shell.theme-light .landing-copy { color:#5c5a6f !important; }
+        .landing-shell.theme-light .glass-card,.landing-shell.theme-light .dashboard-mock { background:rgba(255,255,255,.78) !important; border-color:rgba(72,61,111,.14) !important; }
+        .landing-shell.theme-light .mobile-menu-panel { background:rgba(250,249,253,.98); border-color:rgba(72,61,111,.16); }
+        .landing-shell.theme-light .mobile-menu-link { color:#48465a; }
+        .landing-shell.theme-light .mobile-menu-link:hover,.landing-shell.theme-light .mobile-menu-link:focus-visible { color:#4c2a99; background:rgba(124,58,237,.12); }
+        .landing-shell.theme-light .outline-btn { color:#38364b !important; border-color:rgba(72,61,111,.28); }
+        .landing-shell.theme-light .mock-bar { background:rgba(49,43,76,.11); }
+        .landing-shell.theme-light .nav-link { color:#5c5a6f !important; }
+        .landing-shell.theme-light .seller-badge { color:#6841b8 !important; }
+        .landing-shell.theme-light .text-slate-400 { color:#5c5a6f !important; }
+        .landing-shell.theme-light [style*="color: white"],.landing-shell.theme-light [style*="color: #e2e8f0"],.landing-shell.theme-light [style*="color: rgb(226, 232, 240)"] { color:#29283b !important; }
+        .landing-shell.theme-light [style*="color: #94a3b8"],.landing-shell.theme-light [style*="color: rgb(148, 163, 184)"],.landing-shell.theme-light [style*="color: #64748b"],.landing-shell.theme-light [style*="color: rgb(100, 116, 139)"],.landing-shell.theme-light [style*="color: #475569"],.landing-shell.theme-light [style*="color: rgb(71, 85, 105)"] { color:#5c5a6f !important; }
+        .landing-shell.theme-light [style*="color: #cbd5e1"],.landing-shell.theme-light [style*="color: rgb(203, 213, 225)"] { color:#5c5a6f !important; }
+        .landing-shell.theme-light [style*="color: #a78bfa"],.landing-shell.theme-light [style*="color: rgb(167, 139, 250)"] { color:#6841b8 !important; }
+        .landing-shell.theme-light .cta-btn,.landing-shell.theme-light .pricing-popular-badge { color:#fff !important; }
+        .landing-shell.theme-light [style*="border: 1px solid rgba(255,255,255"] { border-color:rgba(72,61,111,.15) !important; }
         @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.05)} 66%{transform:translate(-20px,10px) scale(0.97)} }
         @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(-25px,15px) scale(1.03)} 66%{transform:translate(20px,-25px) scale(0.98)} }
         @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(15px,20px) scale(1.04)} }
@@ -177,6 +197,10 @@ export default function LandingPage() {
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
         }
         .cta-btn::before {
           content: '';
@@ -191,6 +215,10 @@ export default function LandingPage() {
         .outline-btn {
           border: 1px solid rgba(255,255,255,0.2);
           transition: all 0.3s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
         }
         .outline-btn:hover {
           border-color: rgba(139,92,246,0.6);
@@ -281,7 +309,7 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        background: isScrolled ? "rgba(5,8,20,0.85)" : "transparent",
+        background: isScrolled ? (lightTheme ? "rgba(244,242,250,0.9)" : "rgba(16,17,29,0.88)") : "transparent",
         backdropFilter: isScrolled ? "blur(20px)" : "none",
         borderBottom: isScrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
         transition: "all 0.3s ease",
@@ -294,24 +322,33 @@ export default function LandingPage() {
             <span style={{ fontWeight: 700, fontSize: "16px", color: "white" }}>CRM</span>
           </div>
 
-          <div className="hidden md:flex" style={{ display: "none", alignItems: "center", gap: "32px" }}>
+          <div className="hidden md:flex" style={{ alignItems: "center", gap: "32px" }}>
             {["Features", "Pricing", "Contact"].map(item => (
               <a key={item} href={`#${item.toLowerCase()}`} className="nav-link" style={{ fontSize: "14px", fontWeight: 500, color: "#94a3b8" }}>{item}</a>
             ))}
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <ThemeToggle compact />
             <Link href="/login">
-              <button className="outline-btn hidden md:block" style={{ display: "none", padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 500, color: "white", cursor: "pointer", background: "transparent" }}>
+              <span className="outline-btn hidden md:block" style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 500, color: "white", cursor: "pointer", background: "transparent" }}>
                 Sign In
-              </button>
+              </span>
             </Link>
             <Link href="/login">
-              <button className="cta-btn" style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
+              <span className="cta-btn" style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
                 <span>Start Free</span>
-              </button>
+              </span>
             </Link>
-            <button onClick={() => setMobileOpen(!mobileOpen)} style={{ display: "flex", background: "none", border: "none", color: "white", cursor: "pointer", padding: "8px 4px" }} className="md:hidden mobile-menu-btn">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
+              style={{ background: "none", border: "none", color: "white", cursor: "pointer", padding: "8px 4px" }}
+              className="md:hidden mobile-menu-btn"
+            >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -323,9 +360,9 @@ export default function LandingPage() {
               <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)} className="mobile-menu-link">{item}</a>
             ))}
             <Link href="/login">
-              <button className="cta-btn mobile-menu-cta" style={{ fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
+              <span className="cta-btn mobile-menu-cta" style={{ fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
                 <span>Start Free</span>
-              </button>
+              </span>
             </Link>
           </div>
         )}
@@ -336,7 +373,7 @@ export default function LandingPage() {
         <FadeIn>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", borderRadius: "999px", padding: "6px 16px", marginBottom: "32px" }}>
             <Star size={12} color="#a78bfa" fill="#a78bfa" />
-            <span style={{ fontSize: "13px", color: "#a78bfa", fontWeight: 500 }}>Built for Filipino Online Sellers</span>
+            <span className="seller-badge" style={{ fontSize: "13px", color: "#a78bfa", fontWeight: 500 }}>Built for Filipino Online Sellers</span>
           </div>
         </FadeIn>
 
@@ -356,15 +393,15 @@ export default function LandingPage() {
         <FadeIn delay={300}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center", marginBottom: "72px" }}>
             <Link href="/login">
-              <button className="cta-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 700, color: "white", cursor: "pointer", border: "none", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span className="cta-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 700, color: "white", cursor: "pointer", border: "none", display: "flex", alignItems: "center", gap: "8px" }}>
                 <span>Start Free</span>
                 <ArrowRight size={16} />
-              </button>
+              </span>
             </Link>
             <Link href="/demo">
-              <button className="outline-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent" }}>
+              <span className="outline-btn" style={{ padding: "14px 32px", borderRadius: "10px", fontSize: "16px", fontWeight: 600, color: "white", cursor: "pointer", background: "transparent" }}>
                 Watch Demo
-              </button>
+              </span>
             </Link>
           </div>
         </FadeIn>
@@ -544,10 +581,10 @@ export default function LandingPage() {
             <h2 style={{ fontSize: "clamp(24px, 4vw, 40px)", fontWeight: 800, color: "white", marginBottom: "16px", letterSpacing: "-1px" }}>Try the Dashboard Before You Sign Up</h2>
             <p style={{ color: "#94a3b8", marginBottom: "36px", fontSize: "16px", lineHeight: 1.6 }}>See exactly how CRM Dashboard works. No credit card required.</p>
             <Link href="/login">
-              <button className="cta-btn" style={{ padding: "14px 36px", borderRadius: "10px", fontSize: "16px", fontWeight: 700, color: "white", cursor: "pointer", border: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <span className="cta-btn" style={{ padding: "14px 36px", borderRadius: "10px", fontSize: "16px", fontWeight: 700, color: "white", cursor: "pointer", border: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 <span>Try Demo Account</span>
                 <ChevronRight size={18} />
-              </button>
+              </span>
             </Link>
           </div>
         </FadeIn>
@@ -578,7 +615,7 @@ export default function LandingPage() {
                 }),
               }}>
                 {plan.highlight && (
-                  <div style={{ position: "absolute", top: "-13px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg,#7c3aed,#4f46e5)", borderRadius: "999px", padding: "4px 16px", fontSize: "12px", fontWeight: 700, color: "white", whiteSpace: "nowrap" }}>
+                  <div className="pricing-popular-badge" style={{ position: "absolute", top: "-13px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg,#7c3aed,#4f46e5)", borderRadius: "999px", padding: "4px 16px", fontSize: "12px", fontWeight: 700, color: "white", whiteSpace: "nowrap" }}>
                     Most Popular
                   </div>
                 )}
@@ -596,7 +633,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <Link href="/login">
-                  <button
+                  <span
                     className={plan.highlight ? "cta-btn" : "outline-btn"}
                     style={{
                       width: "100%", padding: "12px", borderRadius: "10px",
@@ -605,7 +642,7 @@ export default function LandingPage() {
                     }}
                   >
                     <span>{plan.cta}</span>
-                  </button>
+                  </span>
                 </Link>
               </div>
             </FadeIn>
@@ -639,9 +676,9 @@ export default function LandingPage() {
               <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "10px" }}>Starter — ₱199/month</div>
               <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "10px" }}>Pro — ₱499/month</div>
               <Link href="/login">
-                <button className="cta-btn" style={{ marginTop: "16px", padding: "10px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
+                <span className="cta-btn" style={{ marginTop: "16px", padding: "10px 20px", borderRadius: "8px", fontSize: "13px", fontWeight: 600, color: "white", cursor: "pointer", border: "none" }}>
                   <span>Get Started</span>
-                </button>
+                </span>
               </Link>
             </div>
             <div>

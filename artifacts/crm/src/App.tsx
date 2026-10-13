@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2 } from "lucide-react";
 import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import { supabase } from "@/lib/supabase";
+import { ThemeProvider } from "next-themes";
 
 // In development, Vite proxies /api to the Express server automatically.
 // In production, VITE_API_URL should point to your deployed API (e.g. Render, Railway).
@@ -49,7 +50,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -72,7 +73,7 @@ function LoginRoute() {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -128,9 +129,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <AuthProvider>
-            <Router />
-          </AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="crm-theme" disableTransitionOnChange>
+            <AuthProvider>
+              <Router />
+            </AuthProvider>
+          </ThemeProvider>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

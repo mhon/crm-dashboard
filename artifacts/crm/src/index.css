@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -286,4 +287,115 @@
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
   }
+}
+
+:root {
+  color-scheme: light;
+  --background: 228 32% 97%;
+  --foreground: 228 26% 16%;
+  --border: 225 22% 88%;
+  --card: 0 0% 100%;
+  --card-foreground: 228 26% 16%;
+  --card-border: 225 22% 88%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 228 26% 16%;
+  --popover-border: 225 22% 88%;
+  --primary: 263 72% 54%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 230 28% 94%;
+  --secondary-foreground: 228 26% 22%;
+  --muted: 228 25% 94%;
+  --muted-foreground: 225 12% 43%;
+  --accent: 267 75% 95%;
+  --accent-foreground: 263 60% 35%;
+  --input: 225 22% 88%;
+  --ring: 263 72% 54%;
+  --chart-1: 263 72% 54%;
+  --chart-2: 174 55% 39%;
+  --chart-3: 32 86% 58%;
+  --chart-4: 202 70% 48%;
+  --chart-5: 338 62% 56%;
+  --sidebar: 232 35% 15%;
+  --sidebar-foreground: 220 30% 93%;
+  --sidebar-border: 232 28% 23%;
+  --sidebar-primary: 266 85% 73%;
+  --sidebar-primary-foreground: 232 35% 15%;
+  --sidebar-accent: 232 27% 22%;
+  --sidebar-accent-foreground: 220 30% 96%;
+  --app-font-sans: 'DM Sans', sans-serif;
+  --app-font-serif: 'Manrope', sans-serif;
+  --app-font-mono: 'IBM Plex Mono', monospace;
+  --radius: .75rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 230 27% 10%;
+  --foreground: 225 24% 93%;
+  --border: 228 20% 22%;
+  --card: 232 24% 14%;
+  --card-foreground: 225 24% 93%;
+  --card-border: 228 20% 23%;
+  --popover: 232 24% 14%;
+  --popover-foreground: 225 24% 93%;
+  --popover-border: 228 20% 23%;
+  --primary: 263 78% 72%;
+  --primary-foreground: 232 35% 12%;
+  --secondary: 230 19% 21%;
+  --secondary-foreground: 225 24% 93%;
+  --muted: 230 19% 21%;
+  --muted-foreground: 224 13% 66%;
+  --accent: 266 38% 23%;
+  --accent-foreground: 266 85% 86%;
+  --input: 228 20% 25%;
+  --ring: 266 85% 73%;
+  --chart-1: 266 85% 73%;
+  --chart-2: 171 52% 58%;
+  --chart-3: 32 86% 66%;
+  --chart-4: 202 72% 65%;
+  --chart-5: 338 68% 70%;
+  --sidebar: 232 35% 12%;
+  --sidebar-foreground: 220 22% 86%;
+  --sidebar-border: 232 25% 21%;
+  --sidebar-primary: 266 85% 73%;
+  --sidebar-primary-foreground: 232 35% 12%;
+  --sidebar-accent: 232 25% 19%;
+  --sidebar-accent-foreground: 220 22% 96%;
+}
+
+@layer base {
+  body { min-height: 100dvh; font-feature-settings: "ss01" on; }
+  :focus-visible { outline: 3px solid hsl(var(--ring) / .55); outline-offset: 2px; }
+}
+
+@layer components {
+  .crm-page { animation: page-enter .35s ease-out both; }
+  .crm-panel { border: 1px solid hsl(var(--border)); border-radius: 1rem; background: hsl(var(--card)); box-shadow: 0 8px 28px hsl(230 30% 20% / .045); }
+  .dark .crm-panel { box-shadow: 0 12px 34px hsl(230 45% 4% / .18); }
+  .page-eyebrow { color: hsl(var(--primary)); font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+  .theme-toggle { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border:1px solid hsl(var(--border)); border-radius:999px; background:hsl(var(--card)); color:hsl(var(--foreground)); padding:.55rem .8rem; font-size:.78rem; font-weight:600; transition:background .2s ease, transform .2s ease; }
+  .theme-toggle:hover { background:hsl(var(--accent)); transform:translateY(-1px); }
+}
+
+@layer base {
+  ::selection { background: hsl(var(--primary) / .2); color: hsl(var(--foreground)); }
+  input, textarea, select { color-scheme: inherit; }
+}
+
+@layer utilities {
+  .bg-muted\/40 { background-color: hsl(var(--muted) / .58); }
+}
+
+[class~="rounded-xl"][class~="border"][class~="bg-card"] {
+  border-color: hsl(var(--card-border));
+  box-shadow: 0 8px 26px hsl(230 25% 25% / .045);
+}
+.dark [class~="rounded-xl"][class~="border"][class~="bg-card"] {
+  box-shadow: 0 12px 30px hsl(230 50% 3% / .16);
+}
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+
+@keyframes page-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

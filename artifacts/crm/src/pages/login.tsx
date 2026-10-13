@@ -18,6 +18,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Link } from "wouter";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -237,11 +239,16 @@ function RegisterForm() {
 
 export default function Login() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
+    <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-background p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/.13),transparent_45%)]" />
+      <div className="absolute right-5 top-5 z-10"><ThemeToggle /></div>
+      <Card className="relative w-full max-w-md border-card-border shadow-xl shadow-primary/5">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">CRM Dashboard</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
+          <Link href="/" className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground">O</span> Orbit CRM
+          </Link>
+          <CardTitle className="text-2xl font-bold tracking-tight">Your business, in rhythm.</CardTitle>
+          <CardDescription>Sign in or create an account to continue to your workspace.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6 space-y-4">

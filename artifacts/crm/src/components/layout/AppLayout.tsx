@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Users, ShoppingCart, LogOut, Menu, Building2, Contact, ListTodo, BarChart3, Workflow } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { TrendingUp } from "lucide-react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
@@ -13,6 +15,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    { name: "Orders", href: "/orders", icon: ShoppingCart },
     { name: "Companies", href: "/companies", icon: Building2 },
     { name: "Leads", href: "/leads", icon: Contact },
     { name: "Customers", href: "/customers", icon: Users },
@@ -23,6 +26,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const getPageTitle = () => {
     if (location === "/dashboard") return "Dashboard";
     if (location === "/analytics") return "Analytics";
+    if (location === "/orders" || location.startsWith("/orders/")) return "Orders";
     if (location === "/companies" || location.startsWith("/companies/")) return "Companies";
     if (location === "/leads" || location.startsWith("/leads/")) return "Leads";
     if (location === "/customers" || location.startsWith("/customers/")) return "Customers";
@@ -42,8 +46,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <span
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               }`}
             >
               <item.icon className="h-4 w-4" />
@@ -56,7 +60,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40 md:flex-row">
+    <div className="flex min-h-[100dvh] w-full flex-col bg-background md:flex-row">
       {/* Mobile Header */}
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -68,14 +72,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </SheetTrigger>
           <SheetContent side="left" className="sm:max-w-xs">
             <nav className="grid gap-2 text-lg font-medium">
-              <div className="flex h-14 items-center border-b px-2 font-semibold tracking-tight">
-                CRM Dashboard
+              <div className="flex h-14 items-center gap-3 border-b px-2 font-semibold tracking-tight">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground"><TrendingUp className="h-4 w-4" /></span>
+                <span>Orbit <span className="text-muted-foreground">CRM</span></span>
               </div>
               <div className="py-4 grid gap-1">
                 <NavLinks />
               </div>
             </nav>
             <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
+              <ThemeToggle />
               <div className="text-sm font-medium truncate px-2">{user?.email}</div>
               <Button variant="outline" className="w-full justify-start gap-2" onClick={signOut}>
                 <LogOut className="h-4 w-4" />
@@ -84,21 +90,25 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </SheetContent>
         </Sheet>
-        <div className="font-semibold">{getPageTitle()}</div>
+        <div className="font-semibold tracking-tight">{getPageTitle()}</div>
+        <div className="ml-auto"><ThemeToggle compact /></div>
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-background md:flex">
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6 font-semibold tracking-tight">
-          CRM Dashboard
+      <aside className="hidden w-[258px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+        <div className="flex h-[76px] items-center gap-3 border-b border-sidebar-border px-5 font-semibold tracking-tight">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground"><TrendingUp className="h-4 w-4" /></span>
+          <span className="text-base">Orbit <span className="text-sidebar-foreground/55">CRM</span></span>
         </div>
-        <div className="flex-1 overflow-auto py-2">
-          <nav className="grid items-start px-2 text-sm font-medium lg:px-4 gap-1">
+        <div className="flex-1 overflow-auto py-6">
+          <p className="px-6 pb-3 text-[10px] font-bold uppercase tracking-[.18em] text-sidebar-foreground/40">Workspace</p>
+          <nav className="grid items-start px-3 text-sm font-medium gap-1">
             <NavLinks />
           </nav>
         </div>
-        <div className="mt-auto border-t p-4 flex flex-col gap-3">
-          <div className="text-sm font-medium truncate text-muted-foreground">
+        <div className="mt-auto border-t border-sidebar-border p-4 flex flex-col gap-3">
+          <ThemeToggle />
+          <div className="truncate rounded-xl bg-sidebar-accent px-3 py-2 text-xs font-medium text-sidebar-foreground/75">
             {user?.email}
           </div>
           <Button variant="outline" className="w-full justify-start gap-2" onClick={signOut}>
@@ -109,9 +119,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 w-full max-w-[1200px] mx-auto">
-        <div className="hidden md:flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold tracking-tight">{getPageTitle()}</h1>
+      <main className="flex-1 p-4 sm:p-6 lg:p-9 w-full max-w-[1500px] mx-auto">
+        <div className="hidden md:flex items-center justify-between mb-8 border-b border-border/70 pb-5">
+          <div>
+            <p className="page-eyebrow mb-1">Seller workspace</p>
+            <h1 className="text-2xl font-bold tracking-tight">{getPageTitle()}</h1>
+          </div>
+          <div className="text-xs font-medium text-muted-foreground">Today, {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date())}</div>
         </div>
         {children}
       </main>
