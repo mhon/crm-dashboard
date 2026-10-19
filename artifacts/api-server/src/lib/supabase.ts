@@ -15,7 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export function getClient(req: Request) {
   const authHeader = req.headers.authorization;
-  if (authHeader?.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ") && !authHeader.includes("dev-token")) {
     const token = authHeader.slice(7);
     return createClient(supabaseUrl!, supabaseAnonKey!, {
       global: { headers: { Authorization: `Bearer ${token}` } },

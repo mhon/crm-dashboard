@@ -295,6 +295,8 @@ export function CommandPalette() {
         aria-label="Quick Switcher"
         onKeyDown={onKeyDown}
       >
+        {isMobile && <div className="cmd-mobile-handle" />}
+
         {/* Search bar */}
         <div className="cmd-search-bar">
           <Search className="cmd-search-icon" />

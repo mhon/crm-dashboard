@@ -17,6 +17,9 @@ if (apiUrl) {
 }
 
 setAuthTokenGetter(async () => {
+  if (typeof window !== "undefined" && localStorage.getItem("orbit_dev_session")) {
+    return "dev-token";
+  }
   const { data } = await supabase.auth.getSession();
   return data.session?.access_token ?? null;
 });

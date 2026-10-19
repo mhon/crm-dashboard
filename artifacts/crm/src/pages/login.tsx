@@ -17,9 +17,10 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Zap, ShieldCheck } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Link } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -238,6 +239,15 @@ function RegisterForm() {
 }
 
 export default function Login() {
+  const [, setLocation] = useLocation();
+  const { devLogin } = useAuth();
+  const isLocal = typeof window !== "undefined" && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local") ||
+    import.meta.env.DEV
+  );
+
   return (
     <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-background p-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/.13),transparent_45%)]" />
@@ -251,6 +261,33 @@ export default function Login() {
           <CardDescription>Sign in or create an account to continue to your workspace.</CardDescription>
         </CardHeader>
         <CardContent>
+          {isLocal && (
+            <div className="mb-5 rounded-xl border border-primary/25 bg-primary/5 p-3.5">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                  <Zap className="h-3.5 w-3.5 fill-primary" />
+                  Local Development Mode
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+                  Bypass OAuth
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                Google OAuth redirects to production. Use 1-Click Dev Sign In to test locally without leaving localhost.
+              </p>
+              <Button
+                type="button"
+                className="w-full flex items-center justify-center gap-2 font-semibold shadow-sm"
+                onClick={() => {
+                  devLogin("mhonbastasa@gmail.com");
+                  setLocation("/dashboard");
+                }}
+              >
+                <ShieldCheck className="h-4 w-4" />
+                Sign in as mhonbastasa@gmail.com
+              </Button>
+            </div>
+          )}
           <div className="mb-6 space-y-4">
             <Button
               variant="outline"
