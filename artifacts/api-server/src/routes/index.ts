@@ -10,6 +10,7 @@ import tasksRouter from "./tasks";
 import aiRouter from "./ai";
 import analyticsRouter from "./analytics";
 import workflowsRouter from "./workflows";
+import searchRouter from "./search";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(tasksRouter);
 router.use("/ai", aiRouter);
 router.use("/analytics", analyticsRouter);
 router.use("/workflows", workflowsRouter);
+router.use(searchRouter);
 
 export default router;

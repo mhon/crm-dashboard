@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Users, ShoppingCart, LogOut, Menu, Building2, Contact, ListTodo, BarChart3, Workflow } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingCart, LogOut, Menu, Building2, Contact, ListTodo, BarChart3, Workflow, Search } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TrendingUp } from "lucide-react";
+import { CommandPalette } from "@/components/CommandPalette";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
@@ -59,8 +60,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </>
   );
 
+  // Helper to emit Ctrl+K so CommandPalette opens
+  const triggerCommandPalette = () => {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true })
+    );
+  };
+
   return (
     <div className="flex min-h-[100dvh] w-full flex-col bg-background md:flex-row">
+      {/* Global Command Palette */}
+      <CommandPalette />
+
       {/* Mobile Header */}
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 md:hidden">
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -91,7 +102,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </SheetContent>
         </Sheet>
         <div className="font-semibold tracking-tight">{getPageTitle()}</div>
-        <div className="ml-auto"><ThemeToggle compact /></div>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={triggerCommandPalette}
+            className="flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+          <ThemeToggle compact />
+        </div>
       </header>
 
       {/* Desktop Sidebar */}
@@ -100,7 +120,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground"><TrendingUp className="h-4 w-4" /></span>
           <span className="text-base">Orbit <span className="text-sidebar-foreground/55">CRM</span></span>
         </div>
-        <div className="flex-1 overflow-auto py-6">
+        {/* Search trigger button */}
+        <div className="px-3 pt-4 pb-1">
+          <button
+            onClick={triggerCommandPalette}
+            className="flex w-full items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/50 px-3 py-2 text-sm text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground/80"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span className="flex-1 text-left text-xs">Search…</span>
+            <kbd className="ml-auto flex h-5 items-center gap-0.5 rounded border border-sidebar-border bg-sidebar px-1.5 text-[0.6rem] font-semibold text-sidebar-foreground/40">
+              Ctrl K
+            </kbd>
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto py-4">
           <p className="px-6 pb-3 text-[10px] font-bold uppercase tracking-[.18em] text-sidebar-foreground/40">Workspace</p>
           <nav className="grid items-start px-3 text-sm font-medium gap-1">
             <NavLinks />
@@ -132,3 +165,4 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
